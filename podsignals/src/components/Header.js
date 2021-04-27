@@ -97,7 +97,6 @@ const useStyles = makeStyles(theme => ({
         height: "50px",
         width: "50px",
         color: 'white'
-
     },
     drawerIconContainer: {
         marginLeft: "auto",
@@ -106,7 +105,7 @@ const useStyles = makeStyles(theme => ({
         }
     },
     drawer: {
-        backgroundColor: theme.palette.common.blue
+        backgroundColor: theme.palette.common.red
     },
     drawerItem: {
         ...theme.typography.tab,
@@ -131,8 +130,8 @@ export default function Header(props) {
     const theme = useTheme()
     const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
 // this useMediaQuery function tells us the size of the vp, thats how we can start building a responsive webapp
-    const matches = useMediaQuery(theme.breakpoints.down("md"))
-
+    const matchesMD = useMediaQuery(theme.breakpoints.down("md"))
+    const matchesSM = useMediaQuery(theme.breakpoints.down("sm"))
 
     const [openDrawer, setOpenDrawer] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null)
@@ -283,7 +282,7 @@ export default function Header(props) {
                         {/*<Button component={Link} to='/' disableRipple onClick={() => props.setValue(0)}className={classes.logoContainer} >*/}
                         {/*    <img src={logo} alt='company logo' className={classes.logo}/>*/}
                         {/*</Button>*/}
-                        {matches ? drawer : tabs}
+                        {matchesSM ? drawer : tabs}
                     </Toolbar>
                 </AppBar>
             </ElevationScroll>
