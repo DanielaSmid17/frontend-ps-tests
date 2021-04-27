@@ -5,13 +5,14 @@ import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import {makeStyles} from '@material-ui/core/styles'
 import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
-
+import Avatar from '@material-ui/core/Avatar'
+import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import {useTheme} from '@material-ui/core/styles'
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer'
+import Drawer from '@material-ui/core/Drawer'
 import MenuIcon from '@material-ui/icons/Menu'
 import IconButton from '@material-ui/core/IconButton'
 import List from '@material-ui/core/List'
@@ -67,8 +68,9 @@ const useStyles = makeStyles(theme => ({
     },
     tab: {
         ...theme.typography.tab,
-        minWidth: 10,
-        marginLeft: '25px'
+        minWidth: 5,
+        marginLeft: '25px',
+        marginTop: '.5em'
     },
     button: {
         ...theme.typography.button,
@@ -106,7 +108,8 @@ const useStyles = makeStyles(theme => ({
         }
     },
     drawer: {
-        backgroundColor: theme.palette.common.blue
+        backgroundColor: theme.palette.common.red,
+        zIndex: 1009
     },
     drawerItem: {
         ...theme.typography.tab,
@@ -122,7 +125,12 @@ const useStyles = makeStyles(theme => ({
         }
     },
     appBar: {
-        zIndex: theme.zIndex.modal + 1
+        zIndex: theme.zIndex.modal + 1,
+        height: '5em'
+    },
+    avatar: {
+        fontFamily: 'Raleway',
+        marginTop: '.5em'
     }
 }))
 
@@ -160,22 +168,21 @@ export default function Header(props) {
         props.setSelectedIndex(i)
     }
 
-    const menuOptions = [
-        {name: "Podcasts", link: "/podcasts", activeIndex: 1, selectedIndex: 0},
-        {name: "Alerts", link: "/alerts", activeIndex: 1, selectedIndex: 1},
-        {name: "Mentions", link: "/mentions", activeIndex: 1, selectedIndex: 2},
+    const profileOptions = [
+        {name: "Profile", link: "/profile", activeIndex: 5, selectedIndex: 0},
+        {name: "Account", link: "/account", activeIndex: 5, selectedIndex: 1},
     ]
 
     const routes = [
-        {name: "Home", link:"/", activeIndex: 0},
-        {name: "Podcasts", link:"/podcasts", activeIndex: 1, ariaOwns: anchorEl ? "simple-menu" : undefined, ariaPopUp: anchorEl ? true : undefined, mouseOver: e => handleMenuClick(e)  },
-        {name: "Signin", link:"/signin", activeIndex: 2},
-        {name: "About us", link:"/about", activeIndex: 3},
-        {name: "Contact", link:"/contact", activeIndex: 4},
+        {name: "Dashboard", link:"/dashboard", activeIndex: 0},
+        {name: "Profile", link:"/profile", activeIndex: 1, ariaOwns: anchorEl ? "simple-menu" : undefined, ariaPopUp: anchorEl ? true : undefined, mouseOver: e => handleMenuClick(e)  },
+        {name: "Mentions", link:"/mentions", activeIndex: 2},
+        {name: "Alerts", link:"/about", activeIndex: 3},
+        {name: "API", link:"/contact", activeIndex: 4},
     ]
 
     useEffect(() => {
-        [...menuOptions, ...routes].forEach(route => {
+        [...profileOptions, ...routes].forEach(route => {
             switch(window.location.pathname) {
                 case `${route.link}`:
                     if (props.value !== route.activeIndex) {
@@ -191,28 +198,28 @@ export default function Header(props) {
         })
 
 
-    }, [props.value, menuOptions, props.selectedIndex, routes, props])
+    }, [props.value, profileOptions, props.selectedIndex, routes, props])
     const tabs = (
         <React.Fragment>
             <Tabs value={props.value}
                   onChange={handleTabChange}
                   className={classes.tabContainer}
             >
-                {routes.map((route, index) => (
-                    <Tab
-                        key={`${route}${index}`}
-                        className={classes.tab}
-                        component={Link}
-                        to={route.link}
-                        label={route.name}
-                        aria-owns={route.ariaOwns}
-                        aria-haspopup={route.ariaPopup}
-                        onMouseOver={route.mouseOver}
-                    />
+                <Grid container direction='row' alignItems='center' style={{marginRight: '2em'}}>
+                    <Avatar className={classes.avatar}>DS</Avatar>
+                        <Tab
+                            className={classes.tab}
+                            component={Link}
+                            to='/profile'
+                            label='Profile'
+                            aria-owns={anchorEl ? "simple-menu" : undefined}
+                            aria-haspopup={anchorEl ? true : undefined}
+                            onMouseOver={ e => handleMenuClick(e)}
+                        />
 
-                ))}
+
+                </Grid>
             </Tabs>
-            <Button component={Link} to='/estimate' onClick={()=> props.setValue(5)} variant="contained" color="secondary" className={classes.button}>Free Estimate</Button>
             <Menu
                 id='simple-menu'
                 anchorEl={anchorEl}
@@ -223,14 +230,14 @@ export default function Header(props) {
                 elevation={0}
                 style={{zIndex: 1302}}
                 keepMounted>
-                {menuOptions.map((option, i) => (
+                {profileOptions.map((option, i) => (
                     <MenuItem
                         key={`${option}${i}`}
                         component={Link}
                         to={option.link}
                         classes={{root: classes.menuItem}}
-                        onClick={(event) => {handleMenuItemClick(event, i); props.setValue(1); handleMenuClose()}}
-                        selected={i===props.selectedIndex && props.value === 1}
+                        onClick={(event) => {handleMenuItemClick(event, i); props.setValue(2); handleMenuClose()}}
+                        selected={i===props.selectedIndex && props.value === 2}
                     >
                         {option.name}
                     </MenuItem>
@@ -241,18 +248,22 @@ export default function Header(props) {
 
     const drawer = (
         <React.Fragment>
-            <SwipeableDrawer
+            <Drawer
+                variant="permanent"
                 disableBackdropTransition={!iOS}
                 disableDiscovery={iOS}
-                open={openDrawer}
+                open
                 onClose={()=> setOpenDrawer(false)}
                 onOpen={()=> setOpenDrawer(true)}
-                classes={{paper: classes.drawer}} >
+                classes={{paper: classes.drawer}}
+                style={{zIndex: 1009}}>
                 <div className={classes.toolbarMargin} />
                 <List disablePadding>
                     {routes.map(route =>(
                         <ListItem
-                            onClick={()=> {setOpenDrawer(false); props.setValue(route.activeIndex)}}
+                            onClick={()=> {
+                                props.setValue(route.activeIndex); props.setSelectedIndex(undefined)
+                            }}
                             divider
                             button
                             component={Link}
@@ -264,14 +275,8 @@ export default function Header(props) {
                                 disableTypography>{route.name}</ListItemText>
                         </ListItem>
                     ))}
-                    <ListItem classes={{root: classes.drawerItemEstimate}} onClick={() => {setOpenDrawer(false); props.setValue(5)}} divider button component={Link} to='/estimate' selected={props.value  === 5}>
-                        <ListItemText disableTypography className={classes.drawerItem}>Free estimate</ListItemText>
-                    </ListItem>
                 </List>
-            </SwipeableDrawer>
-            <IconButton className={classes.drawerIconContainer}onClick={()=> setOpenDrawer(!openDrawer)} disableRipple>
-                <MenuIcon className={classes.drawerIcon}/>
-            </IconButton>
+            </Drawer>
         </React.Fragment>
     )
 
@@ -280,10 +285,10 @@ export default function Header(props) {
             <ElevationScroll>
                 <AppBar position='fixed' className={classes.appBar}>
                     <Toolbar disableGutters>
-                        {/*<Button component={Link} to='/' disableRipple onClick={() => props.setValue(0)}className={classes.logoContainer} >*/}
-                        {/*    <img src={logo} alt='company logo' className={classes.logo}/>*/}
-                        {/*</Button>*/}
-                        {matches ? drawer : tabs}
+                        {tabs}
+                    </Toolbar>
+                    <Toolbar>
+                        {drawer}
                     </Toolbar>
                 </AppBar>
             </ElevationScroll>

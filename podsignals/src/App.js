@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import Header from './components/Header'
-import Podcasts from './components/Podcasts'
+import Dashboard from './components/Dashboard'
 
 import { ThemeProvider } from '@material-ui/core/styles'
 import theme from './components/ui/Theme'
@@ -14,7 +14,7 @@ function App() {
             <BrowserRouter>
                 <Header value={value} setValue={setValue} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex}/>
                 <Switch>
-                    <Route exact path='/podcasts' render={(props) =>  <Podcasts {...props} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                    <Route exact path='/dashboard' render={(props) =>  <Dashboard {...props} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
                 </Switch>
             </BrowserRouter>
         </ThemeProvider>
