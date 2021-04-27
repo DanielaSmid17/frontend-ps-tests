@@ -36,6 +36,12 @@ export default createMuiTheme({
             "&:hover": {
                 fontWeight: 800
             }
+        },
+        button: {
+            fontFamily: specFont,
+            textTransform: "none",
+            fontWeight: 800,
+            fontSize: '20px'
         }
     }
 })
