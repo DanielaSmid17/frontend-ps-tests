@@ -26,7 +26,7 @@ export default createMuiTheme({
             color: myGrey,
             fontWeight: 700,
             lineHeight: 1.5,
-            fontSize: '16px'
+            fontSize: '20px'
         },
         tab: {
             color: '#FFFFFF',
