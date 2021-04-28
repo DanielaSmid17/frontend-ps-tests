@@ -207,6 +207,7 @@ export default function Header(props) {
                 <Grid container direction='row' alignItems='center' style={{marginRight: '2em'}}>
                     <Avatar className={classes.avatar}>DS</Avatar>
                         <Tab
+                            key='1'
                             className={classes.tab}
                             component={Link}
                             to='/profile'
@@ -260,6 +261,7 @@ export default function Header(props) {
                 <List disablePadding>
                     {routes.map(route =>(
                         <ListItem
+                            key={route.link}
                             onClick={()=> {
                                 props.setValue(route.activeIndex); props.setSelectedIndex(undefined)
                             }}
