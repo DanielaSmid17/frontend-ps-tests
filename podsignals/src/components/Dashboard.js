@@ -7,24 +7,22 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import {makeStyles} from '@material-ui/core/styles'
-import {useTheme} from '@material-ui/core/styles'
+import {makeStyles, useTheme} from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import {Typography} from "@material-ui/core";
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
+import MentionsTable from "./MentionsTable";
 
 
 
 const useStyles = makeStyles(theme => ({
     gridItem: {
-        borderColor: '#A6A6A6',
-        backgroundColor: '#A6A6A6'
+        backgroundColor: 'white'
     },
     formControl: {
         margin: theme.spacing(1),
@@ -60,12 +58,13 @@ const get_mentions = gql`
 `;
 
 function Dashboard(props) {
+    const classes = useStyles()
+    const theme = useTheme()
+
     useEffect(() => {
         sumTotalMentions(props)
     }, []);
 
-
-    console.log(props.mentions)
 
     const [topMentions, setTopMentions] = useState([
         {mention: 'Oracle', total_mentions: 65},
@@ -86,8 +85,6 @@ function Dashboard(props) {
 
 
 
-    const classes = useStyles()
-    const theme = useTheme()
 
 
     // const topThreeMentions = (mentions) => {
@@ -115,27 +112,13 @@ function Dashboard(props) {
         setOpen(true);
     };
 
-    const tableRows = (
-        <React.Fragment>
-            {props.mentions.map((index) =>(
-                <TableRow key={index}>
-                   <TableCell>{props.mentions.date}</TableCell>
-                   <TableCell>{props.mentions.mention}</TableCell>
-                   <TableCell>{props.mentions.pod}</TableCell>
-                   <TableCell>{props.mentions.episode}</TableCell>
-                   <TableCell>{props.mentions.time}</TableCell>
-                   <TableCell>{props.mentions.podcast}</TableCell>
-                </TableRow>
-            ))}
-        </React.Fragment>
-    )
 
 
 
 
     return (
-        <Grid container direction='column' style={{ height: '1000px'}} >
-                <Grid item align='right' style={{marginRight: '5em', marginTop: '2em'}} >
+        <Grid container direction='column' style={{ height: '1000px', width: '92%'}} >
+                <Grid item align='right' style={{marginRight: '12em', marginTop: '2em'}} >
                     <FormControl className={classes.formControl}  >
                         <Select
                             labelId="demo-controlled-open-select-label"
@@ -156,8 +139,8 @@ function Dashboard(props) {
                     </FormControl>
             </Grid>
             <Grid item container direction='row' style={{backgroundColor: 'white', marginLeft: '5em', marginTop: '2em'}} justify='center' spacing={2}>
-                <Grid container lg style={{marginLeft: '2em'}}>
-                   <Grid item className={classes.gridItem} style={{height: "200px"}}>
+                <Grid container direction='column' alignItems='center' lg style={{marginLeft: '2em'}}>
+                   <Grid item className={classes.gridItem} style={{height: "200px"}} >
                       <Typography variant='h2'>
                          Mentions
                       </Typography>
@@ -192,22 +175,15 @@ function Dashboard(props) {
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item container={classes.gridItem} lg style={{backgroundColor: 'pink', height: "200px"}} >
-                <TableContainer>
-                    <Table>
-                        <TableBody>
-                            <TableHead>
-                                <TableCell>Date</TableCell>
-                                <TableCell>Mention</TableCell>
-                                <TableCell>Pod</TableCell>
-                                <TableCell>Episode</TableCell>
-                                <TableCell>Time</TableCell>
-                                <TableCell>Play</TableCell>
-                            </TableHead>
-                            {tableRows}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+            <Grid
+                item
+                container
+                lg
+                style={{ height: "200px", marginLeft: '7em', marginTop: '5em'}}
+                justify='center'>
+                <Grid item alignItems='center'>
+                   <MentionsTable mentions={props.mentions} />
+                </Grid>
             </Grid>
         </Grid>
 

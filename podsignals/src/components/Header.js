@@ -115,12 +115,9 @@ const useStyles = makeStyles(theme => ({
         color: "white",
         opacity: 0.7
     },
-    drawerItemEstimate: {
-        backgroundColor: theme.palette.common.pink,
-    },
     drawerItemSelected: {
         "& .MuiListItemText-root": {
-            opacity: 1
+            opacity: 2
         }
     },
     appBar: {
@@ -137,11 +134,8 @@ export default function Header(props) {
     const classes = useStyles()
     const theme = useTheme()
     const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
-// this useMediaQuery function tells us the size of the vp, thats how we can start building a responsive webapp
     const matches = useMediaQuery(theme.breakpoints.down("md"))
 
-
-    const [openDrawer, setOpenDrawer] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null)
     const [openMenu, setOpenMenu] = useState(false)
 
@@ -254,8 +248,6 @@ export default function Header(props) {
                 disableBackdropTransition={!iOS}
                 disableDiscovery={iOS}
                 open
-                onClose={()=> setOpenDrawer(false)}
-                onOpen={()=> setOpenDrawer(true)}
                 classes={{paper: classes.drawer}}
                 style={{zIndex: 1009}}>
                 <div className={classes.toolbarMargin} />
