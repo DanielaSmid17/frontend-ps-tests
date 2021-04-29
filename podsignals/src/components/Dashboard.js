@@ -15,6 +15,7 @@ import {Typography} from "@material-ui/core";
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 import MentionsTable from "./MentionsTable";
 
@@ -60,6 +61,7 @@ const get_mentions = gql`
 function Dashboard(props) {
     const classes = useStyles()
     const theme = useTheme()
+    const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
 
     useEffect(() => {
         sumTotalMentions(props)
@@ -118,7 +120,7 @@ function Dashboard(props) {
 
     return (
         <Grid container direction='column' style={{ height: '1000px', width: '92%'}} >
-                <Grid item align='right' style={{marginRight: '12em', marginTop: '2em'}} >
+                <Grid item align='right' style={{marginRight: matchesMD ? '4em' : '12em', marginTop: '2em'}} >
                     <FormControl className={classes.formControl}  >
                         <Select
                             labelId="demo-controlled-open-select-label"

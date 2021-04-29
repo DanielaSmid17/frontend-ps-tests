@@ -9,6 +9,7 @@ import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Button from "@material-ui/core/Button";
 import {makeStyles, useTheme} from '@material-ui/core/styles'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Avatar from "@material-ui/core/Avatar";
 import avatar from './ui/images/avatar.png'
 import Grid from "@material-ui/core/Grid";
@@ -16,7 +17,13 @@ import Grid from "@material-ui/core/Grid";
 const useStyles = makeStyles(theme => ({
     table: {
         maxWidth: 1200,
-        width: 900
+        width: 900,
+        [theme.breakpoints.down('md')] : {
+            width: 400
+        },
+        [theme.breakpoints.down('sm')] : {
+            width: 200
+        }
     },
     iconButton: {
         "&:hover": {
@@ -33,6 +40,7 @@ const useStyles = makeStyles(theme => ({
 function MentionsTable(props) {
     const classes = useStyles()
     const theme = useTheme()
+    const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
 
     const [play, setPlay] = useState(false)
 
@@ -49,22 +57,25 @@ function MentionsTable(props) {
     };
 
     const tableHeaders = ["Date", "Mention", "Pod", "Episode", "Time", "Podcast", "Play"]
+    const mdTableHeaders = ["Mention", "Pod", "Play"]
+
+    const headerTableRender = matchesMD ? mdTableHeaders : tableHeaders
 
     const tableRows = (
         <React.Fragment>
             <TableRow>
-                {tableHeaders.map((option) =>(
+                {headerTableRender.map((option) =>(
                     <TableCell className={classes.tableCell} style={{color: theme.palette.secondary.dark}}>{option}</TableCell>
                 ))}
             </TableRow>
             {props.mentions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((mention) =>(
                 <TableRow key={mention.index}>
-                    <TableCell className={classes.tableCell}>{mention.date}</TableCell>
+                    {!matchesMD && <TableCell className={classes.tableCell}>{mention.date}</TableCell>}
                     <TableCell className={classes.tableCell}>{mention.mention}</TableCell>
                     <TableCell className={classes.tableCell}><Grid item direction='row'><Avatar src={avatar} style={{height:'25px', width: '25px'}} />{mention.pod}</Grid> </TableCell>
-                    <TableCell className={classes.tableCell}>{mention.episode}</TableCell>
-                    <TableCell className={classes.tableCell}>{mention.time}</TableCell>
-                    <TableCell className={classes.tableCell}>{mention.podcast}</TableCell>
+                    {!matchesMD && <TableCell className={classes.tableCell}>{mention.episode}</TableCell>}
+                    {!matchesMD && <TableCell className={classes.tableCell}>{mention.time}</TableCell>}
+                    {!matchesMD && <TableCell className={classes.tableCell}>{mention.podcast}</TableCell>}
                     <TableCell className={classes.tableCell}><Button className={classes.iconButton} style={{marginLeft: '-1em'}}>{!play ? <PlayArrowIcon style={{fontSize: 'small'}}/> : <PauseIcon style={{fontSize: 'small'}}/>}</Button></TableCell>
                 </TableRow>
             ))}
