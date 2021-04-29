@@ -42,6 +42,12 @@ export default createMuiTheme({
             textTransform: "none",
             fontWeight: 800,
             fontSize: '20px'
+        },
+        h3: {
+            fontFamily: specFont,
+            fontWeight: 700,
+            fontSize: '35px',
+            color: myBlue
         }
     }
 })

@@ -59,42 +59,43 @@ const get_mentions = gql`
     }
 `;
 
-function Dashboard() {
-    const [mentions, setMentions] = useState([])
-    const [topMentions, setTopMentions] = useState([])
+function Dashboard(props) {
+    useEffect(() => {
+        sumTotalMentions(props)
+    }, []);
 
-    useEffect(()=>{
-        getData()
-    },[])
 
-    const getData=()=>{
-        fetch('MOCK_DATA.json'
-            ,{
-                headers : {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            }
-        )
-            .then(function(response){
-                return response.json();
-            })
-            .then(function(myJson) {
-                setMentions(myJson)
-                console.log(myJson)
-                topThreeMentions(myJson)
-            });
+    console.log(props.mentions)
+
+    const [topMentions, setTopMentions] = useState([
+        {mention: 'Oracle', total_mentions: 65},
+        {mention: 'Coca-cola', total_mentions: 56},
+        {mention: 'Lemonade', total_mentions: 50}
+    ])
+    const [totalMentions, setTotalMentions] = useState(0)
+
+    const sumTotalMentions = () => {
+        let sum = 0
+        for (const mention in props.mentions) {
+            sum += props.mentions[mention].total_mentions
+        }
+        console.log(sum)
+        setTotalMentions(sum)
+
     }
+
+
 
     const classes = useStyles()
     const theme = useTheme()
 
 
-    const topThreeMentions = (mentions) => {
-        const top = mentions.sort(dynamicSort("total_mentions")).slice(0, 3)
-        console.log(top)
-        setTopMentions(top)
-    }
+    // const topThreeMentions = (mentions) => {
+    //     const top = mentions.sort(dynamicSort("total_mentions")).slice(0, 3)
+    //     console.log(top)
+    //     setTopMentions(top)
+    // }
+    // topThreeMentions(props.mentions)
 
 
 /*    const { data, isLoading, error } =  useGQLQuery('mentions', get_mentions)*/
@@ -113,6 +114,21 @@ function Dashboard() {
     const handleOpen = () => {
         setOpen(true);
     };
+
+    const tableRows = (
+        <React.Fragment>
+            {props.mentions.map((index) =>(
+                <TableRow key={index}>
+                   <TableCell>{props.mentions.date}</TableCell>
+                   <TableCell>{props.mentions.mention}</TableCell>
+                   <TableCell>{props.mentions.pod}</TableCell>
+                   <TableCell>{props.mentions.episode}</TableCell>
+                   <TableCell>{props.mentions.time}</TableCell>
+                   <TableCell>{props.mentions.podcast}</TableCell>
+                </TableRow>
+            ))}
+        </React.Fragment>
+    )
 
 
 
@@ -148,7 +164,10 @@ function Dashboard() {
                    </Grid>
                 </Grid>
                 <Grid container direction={"column"} align='center' lg>
-                    <Grid item>
+                    <Grid item style={{marginBottom: '3em'}}>
+                        <Typography variant='h3'>Total Mentions: <span style={{color: "black"}}>{totalMentions}</span></Typography>
+                    </Grid>
+                    <Grid item style={{marginRight: '11em'}}>
                         <Typography variant='h2'>Top 3 mentions</Typography>
                     </Grid>
                     <Grid item>
@@ -174,7 +193,21 @@ function Dashboard() {
                 </Grid>
             </Grid>
             <Grid item container={classes.gridItem} lg style={{backgroundColor: 'pink', height: "200px"}} >
-                table
+                <TableContainer>
+                    <Table>
+                        <TableBody>
+                            <TableHead>
+                                <TableCell>Date</TableCell>
+                                <TableCell>Mention</TableCell>
+                                <TableCell>Pod</TableCell>
+                                <TableCell>Episode</TableCell>
+                                <TableCell>Time</TableCell>
+                                <TableCell>Play</TableCell>
+                            </TableHead>
+                            {tableRows}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Grid>
         </Grid>
 
