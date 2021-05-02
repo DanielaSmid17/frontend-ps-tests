@@ -18,6 +18,7 @@ import Select from '@material-ui/core/Select';
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 import MentionsTable from "./MentionsTable";
+import LineChart from "./LineChart";
 
 
 
@@ -141,12 +142,15 @@ function Dashboard(props) {
                     </FormControl>
             </Grid>
             <Grid item container direction='row' style={{backgroundColor: 'white', marginLeft: '5em', marginTop: '2em'}} justify='center' spacing={2}>
-                <Grid container direction='column' alignItems='center' lg style={{marginLeft: '2em'}}>
-                   <Grid item className={classes.gridItem} style={{height: "200px"}} >
+                <Grid container direction='column' alignItems='center' lg style={{marginLeft: '2em', width: '100%'}} justify='center'>
+                   <Grid item className={classes.gridItem} >
                       <Typography variant='h2'>
                          Mentions
                       </Typography>
                    </Grid>
+                    <Grid item>
+                        <LineChart />
+                    </Grid>
                 </Grid>
                 <Grid container direction={"column"} align='center' lg>
                     <Grid item style={{marginBottom: '3em'}}>
@@ -188,7 +192,6 @@ function Dashboard(props) {
                 </Grid>
             </Grid>
         </Grid>
-
     );
 }
 

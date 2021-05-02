@@ -1,0 +1,10 @@
+{
+    "auth": {
+        "podsignals19e0145c": {
+            "service": "Cognito",
+            "providerPlugin": "awscloudformation",
+            "dependsOn": [],
+            "customAuth": false
+        }
+    }
+}

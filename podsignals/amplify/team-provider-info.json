@@ -1,0 +1,22 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-podsignals-dev-150216-authRole",
+            "UnauthRoleArn": "arn:aws:iam::670145016712:role/amplify-podsignals-dev-150216-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::670145016712:role/amplify-podsignals-dev-150216-authRole",
+            "Region": "eu-central-1",
+            "DeploymentBucketName": "amplify-podsignals-dev-150216-deployment",
+            "UnauthRoleName": "amplify-podsignals-dev-150216-unauthRole",
+            "StackName": "amplify-podsignals-dev-150216",
+            "StackId": "arn:aws:cloudformation:eu-central-1:670145016712:stack/amplify-podsignals-dev-150216/3f491bd0-ab3e-11eb-88c0-021a5f3bc3e4",
+            "AmplifyAppId": "d261acuuxylgkq"
+        },
+        "categories": {
+            "auth": {
+                "podsignals19e0145c": {
+                    "hostedUIProviderCreds": "[{\"ProviderName\":\"Google\",\"client_id\":\"264379142131-n3njs5sh5rffjcntmjuj21i3vp3aas7j.apps.googleusercontent.com\",\"client_secret\":\"1qXUqgEoNOOZwLCZrt34DbK0\"}]"
+                }
+            }
+        }
+    }
+}
