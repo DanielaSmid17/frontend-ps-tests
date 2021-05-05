@@ -3,35 +3,85 @@ import '@progress/kendo-theme-default/dist/all.css'
 import Header from './components/Header'
 import Dashboard from './components/Dashboard'
 import Signup from './components/Signup'
+import Mentions from "./components/Mentions";
+import Alerts from "./components/Alerts";
+import Signin from "./components/Signin";
+
 
 import { ThemeProvider } from '@material-ui/core/styles'
 import theme from './components/ui/Theme'
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
+import UserContext from "./context/UserContext";
+import {Auth} from "aws-amplify";
+
 
 
 function App() {
     const [mentions, setMentions] = useState([])
     const [userToken, setUserToken] = useState('')
+    const [user, setUser] = useState(null)
+    const getData=()=>{
+        fetch('MOCK_DATA.json'
+            ,{
+                headers : {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            }
+        )
+            .then(function(response){
+                console.log(response)
+                return response.json();
+            })
+            .then(function(myJson) {
+                setMentions(myJson)
+                console.log(myJson);
+            });
+    }
+
+    const checkUser = async () => {
+        let authorizedUser;
+        authorizedUser = await Auth.currentAuthenticatedUser()
+        const token = authorizedUser.signInUserSession.accessToken.jwtToken
+        localStorage.setItem('token', token)
+        if (!user) {
+            setUser(authorizedUser)
+        }
+        return authorizedUser
+    }
+
 
     useEffect(() => {
+        getData()
+        checkUser()
+            .then(user => {
+                console.log(user)
+            }).catch(err => {
+                console.log(err)
+        })
         const token = localStorage.getItem('token')
         if(token) {
             setUserToken(token)
         }
 
-    }, [])
-    console.log(mentions)
+    }, [user])
+
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [value, setValue] = useState(0)
     return (
         <ThemeProvider theme={theme}>
-            <BrowserRouter>
-                <Header value={value} setValue={setValue} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex}/>
+            <UserContext.Provider value={{user, setUser}}>
+             <BrowserRouter>
+                <Header value={value} setValue={setValue} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} user={user} setUser={setUser}/>
                 <Switch>
                     <Route exact path='/dashboard' render={(props) =>  <Dashboard {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
-                    <Route exact path='/signup' render={(props) =>  <Signup {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} token={userToken}/>} />
+                    <Route exact path='/signup' render={(props) =>  <Signup {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} token={userToken} setUser={setUser}/>} />
+                    <Route exact path='/mentions' render={(props) =>  <Mentions {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                    <Route exact path='/alerts' render={(props) =>  <Alerts {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                    <Route exact path='/signin' render={(props) =>  <Signin {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
                 </Switch>
-            </BrowserRouter>
+             </BrowserRouter>
+            </UserContext.Provider>
         </ThemeProvider>
 
 

@@ -1,5 +1,5 @@
 export const dynamicSort = (property) => {
-    const sortOrder = 1;
+    let sortOrder = 1;
     if(property[0] === "-") {
         sortOrder = -1;
         property = property.substr(1);

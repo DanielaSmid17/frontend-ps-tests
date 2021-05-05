@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
@@ -13,16 +13,20 @@ import MenuItem from '@material-ui/core/MenuItem'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import {useTheme} from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
+import UserContext from "../context/UserContext";
 
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 
 import {Link} from 'react-router-dom'
+import {Auth} from "aws-amplify";
 
 
 function ElevationScroll(props) {
     const { children } = props;
+
+
 
     const trigger = useScrollTrigger({
         //weather or not there is a little delay
@@ -39,7 +43,7 @@ function ElevationScroll(props) {
 const useStyles = makeStyles(theme => ({
     toolbarMargin: {
         ...theme.mixins.toolbar,
-        marginBottom: "3em",
+        marginBottom: "1em",
         [theme.breakpoints.down('md')]: {
             marginBottom: "2em"
         },
@@ -126,7 +130,8 @@ const useStyles = makeStyles(theme => ({
     },
     avatar: {
         fontFamily: 'Raleway',
-        marginTop: '.5em'
+        marginTop: '.5em',
+        fontWeight: 700
     }
 }))
 
@@ -135,6 +140,7 @@ export default function Header(props) {
     const theme = useTheme()
     const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
     const matches = useMediaQuery(theme.breakpoints.down("md"))
+    const { user } = useContext(UserContext)
 
     const [anchorEl, setAnchorEl] = useState(null)
     const [openMenu, setOpenMenu] = useState(false)
@@ -162,15 +168,15 @@ export default function Header(props) {
     }
 
     const profileOptions = [
-        {name: "Profile", link: "/profile", activeIndex: 5, selectedIndex: 0},
+        {name: "Profile", link: "/profile", activeIndex: 5, selectedIndex: 5},
         {name: "Account", link: "/account", activeIndex: 5, selectedIndex: 1},
     ]
 
     const routes = [
         {name: "Dashboard", link:"/dashboard", activeIndex: 0},
-        {name: "Profile", link:"/profile", activeIndex: 1, ariaOwns: anchorEl ? "simple-menu" : undefined, ariaPopUp: anchorEl ? true : undefined, mouseOver: e => handleMenuClick(e)  },
-        {name: "Mentions", link:"/mentions", activeIndex: 2},
-        {name: "Alerts", link:"/about", activeIndex: 3},
+        // {name: "Profile", link:"/profile", activeIndex: 1, ariaOwns: anchorEl ? "simple-menu" : undefined, ariaPopUp: anchorEl ? true : undefined, mouseOver: e => handleMenuClick(e)  },
+        {name: "Mentions", link:"/mentions", activeIndex: 1},
+        {name: "Alerts", link:"/alerts", activeIndex: 2},
         {name: "API", link:"/api", activeIndex: 4},
         {name: "FAQ", link:"/faq", activeIndex: 5},
     ]
@@ -195,12 +201,12 @@ export default function Header(props) {
     }, [props.value, profileOptions, props.selectedIndex, routes, props])
     const tabs = (
         <React.Fragment>
-            <Tabs value={props.value}
+            <Tabs
                   onChange={handleTabChange}
                   className={classes.tabContainer}
             >
-                <Grid container direction='row' alignItems='center' style={{marginRight: '2em'}}>
-                    <Avatar className={classes.avatar}>DS</Avatar>
+                {user && <Grid container direction='row' alignItems='center' style={{marginRight: '2em'}}>
+                     <Avatar className={classes.avatar}>{user.attributes.email[0].toUpperCase()}</Avatar>
                         <Tab
                             key='1'
                             className={classes.tab}
@@ -211,9 +217,12 @@ export default function Header(props) {
                             aria-haspopup={anchorEl ? true : undefined}
                             onMouseOver={ e => handleMenuClick(e)}
                         />
+                </Grid>}
+                    {!user &&
+                        <Button component={Link} to='/signin'  style={{fontFamily: 'Raleway', color: 'white', marginRight: '2em' }}>Sign in</Button>}
 
 
-                </Grid>
+
             </Tabs>
             <Menu
                 id='simple-menu'
@@ -232,7 +241,7 @@ export default function Header(props) {
                         to={option.link}
                         classes={{root: classes.menuItem}}
                         onClick={(event) => {handleMenuItemClick(event, i); props.setValue(2); handleMenuClose()}}
-                        selected={i===props.selectedIndex && props.value === 2}
+                        selected={i===props.selectedIndex && props.value === 1}
                     >
                         {option.name}
                     </MenuItem>
@@ -269,6 +278,12 @@ export default function Header(props) {
                                 disableTypography>{route.name}</ListItemText>
                         </ListItem>
                     ))}
+                    {props.user && <ListItem>
+                        <Button onClick={()=> {
+                            Auth.signOut();
+                            props.setUser('')
+                        }} style={{fontFamily: 'Raleway', color: 'white', fontSize: '15px'}}>Log out</Button>
+                    </ListItem>}
                 </List>
             </Drawer>
         </React.Fragment>

@@ -46,8 +46,15 @@ export default createMuiTheme({
         h3: {
             fontFamily: specFont,
             fontWeight: 700,
-            fontSize: '35px',
+            fontSize: '55px',
             color: myBlue
+        },
+        body2:{
+            fontFamily: genFont,
+            fontSize: '15px',
+            fontWeight: 800,
+            color: myGrey
+
         }
     }
 })

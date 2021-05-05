@@ -121,7 +121,10 @@ function Dashboard(props) {
 
     return (
         <Grid container direction='column' style={{ height: '1000px', width: '92%'}} >
-                <Grid item align='right' style={{marginRight: matchesMD ? '4em' : '12em', marginTop: '2em'}} >
+            <Grid item align='center' style={{marginTop: '3em'}}>
+                <Typography variant='h3'>Dashboard</Typography>
+            </Grid>
+                <Grid item align='right' style={{marginRight: matchesMD ? '4em' : '12em', marginTop: '3em'}} >
                     <FormControl className={classes.formControl}  >
                         <Select
                             labelId="demo-controlled-open-select-label"
@@ -141,20 +144,20 @@ function Dashboard(props) {
                         </Select>
                     </FormControl>
             </Grid>
-            <Grid item container direction='row' style={{backgroundColor: 'white', marginLeft: '5em', marginTop: '2em'}} justify='center' spacing={2}>
-                <Grid container direction='column' alignItems='center' lg style={{marginLeft: '2em', width: '100%'}} justify='center'>
+            <Grid item container direction='row' style={{backgroundColor: 'white', marginLeft: '5em', marginTop: '2em', marginBottom: matchesMD ? '2em' : 0}} justify='center' spacing={2}>
+                <Grid container direction='column' alignItems='center' lg style={{marginLeft: matchesMD ? '8em' : '2em', width: '100%'}} justify='center'>
                    <Grid item className={classes.gridItem} >
                       <Typography variant='h2'>
                          Mentions
                       </Typography>
                    </Grid>
-                    <Grid item>
+                    <Grid item style={{marginLeft: '5em'}}>
                         <LineChart />
                     </Grid>
                 </Grid>
-                <Grid container direction={"column"} align='center' lg>
-                    <Grid item style={{marginBottom: '3em'}}>
-                        <Typography variant='h3'>Total Mentions: <span style={{color: "black"}}>{totalMentions}</span></Typography>
+                <Grid container direction="column" align='center'  style={{marginTop: matchesMD ? '4em' : 0}} lg>
+                    <Grid item style={{marginBottom: matchesMD ? '1em' : '3em'}}>
+                        <Typography variant='h3' style={{color: theme.palette.primary.dark, fontSize: '35px'}}>Total Mentions: <span style={{color: "black", fontSize: '30px'}}>{totalMentions}</span></Typography>
                     </Grid>
                     <Grid item style={{marginRight: '11em'}}>
                         <Typography variant='h2'>Top 3 mentions</Typography>

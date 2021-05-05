@@ -17,7 +17,7 @@ import Grid from "@material-ui/core/Grid";
 const useStyles = makeStyles(theme => ({
     table: {
         maxWidth: 1200,
-        width: 900,
+        width: 1000,
         [theme.breakpoints.down('md')] : {
             width: 400
         },
@@ -65,16 +65,25 @@ function MentionsTable(props) {
         <React.Fragment>
             <TableRow>
                 {headerTableRender.map((option) =>(
-                    <TableCell className={classes.tableCell} style={{color: theme.palette.secondary.dark}}>{option}</TableCell>
+                    <TableCell key={option} className={classes.tableCell} style={{color: theme.palette.secondary.dark}}>{option}</TableCell>
                 ))}
             </TableRow>
             {props.mentions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((mention) =>(
-                <TableRow key={mention.index}>
+                <TableRow key={mention}>
                     {!matchesMD && <TableCell className={classes.tableCell}>{mention.date}</TableCell>}
                     <TableCell className={classes.tableCell}>{mention.mention}</TableCell>
-                    <TableCell className={classes.tableCell}><Grid item direction='row'><Avatar src={avatar} style={{height:'25px', width: '25px'}} />{mention.pod}</Grid> </TableCell>
+                    <TableCell className={classes.tableCell}>
+                        <Grid item direction='row'>
+                            <Grid item>
+                                <Avatar src={avatar} style={{height:'25px', width: '25px'}} />
+                            </Grid>
+                            <Grid item>
+                                {mention.pod}
+                            </Grid>
+                        </Grid>
+                    </TableCell>
                     {!matchesMD && <TableCell className={classes.tableCell}>{mention.episode}</TableCell>}
-                    {!matchesMD && <TableCell className={classes.tableCell}>{mention.time}</TableCell>}
+                    {!matchesMD && <TableCell className={classes.tableCell}>{mention.time.split(' ')[0]}</TableCell>}
                     {!matchesMD && <TableCell className={classes.tableCell}>{mention.podcast}</TableCell>}
                     <TableCell className={classes.tableCell}><Button className={classes.iconButton} style={{marginLeft: '-1em'}}>{!play ? <PlayArrowIcon style={{fontSize: 'small'}}/> : <PauseIcon style={{fontSize: 'small'}}/>}</Button></TableCell>
                 </TableRow>
