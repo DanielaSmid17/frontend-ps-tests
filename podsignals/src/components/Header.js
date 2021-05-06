@@ -281,7 +281,9 @@ export default function Header(props) {
                     {props.user && <ListItem>
                         <Button onClick={()=> {
                             Auth.signOut();
-                            props.setUser('')
+                            props.setUser('');
+                            window.location='/signin';
+                            localStorage.removeItem('token')
                         }} style={{fontFamily: 'Raleway', color: 'white', fontSize: '15px'}}>Log out</Button>
                     </ListItem>}
                 </List>

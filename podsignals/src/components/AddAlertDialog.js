@@ -108,10 +108,12 @@ function AddAlertDialog(props) {
                     <Grid item style={{marginBottom: '0.5em', marginLeft: '1.25em'}}>
                         <Typography variant='h2' style={{fontSize: '18px'}}>Key Word</Typography>
                         <TextField
-                            label=<Typography variant='body1' style={{fontSize: '12px'}}>Type here your Key Word </Typography>
+                            fullWidth
                             id='name'
                             value={keyWord}
-                            onChange={(e) => setKeyword(e.target.value)}/>
+                            onChange={(e) => setKeyword(e.target.value)}
+                            label=<Typography variant='body1' style={{fontSize: '12px'}}>Type here your Key Word </Typography>
+                        />
                     </Grid>
                     <Grid item>
                         <FormControl component="fieldset" className={classes.formControl}>
@@ -130,7 +132,7 @@ function AddAlertDialog(props) {
                                     label={<Typography variant='body2'>Phone Call</Typography>}
                                 />
                             </FormGroup>
-                            <FormHelperText>You can choose more than one</FormHelperText>
+                            <FormHelperText style={{fontFamily: 'Raleway', fontWeight: 700}}>You can choose more than one</FormHelperText>
                         </FormControl>
                     </Grid>
                 </Grid>

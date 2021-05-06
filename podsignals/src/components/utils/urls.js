@@ -1,0 +1,1 @@
+export const authUrlBase = 'https://ly97lwj4yl.execute-api.us-east-2.amazonaws.com/dev'

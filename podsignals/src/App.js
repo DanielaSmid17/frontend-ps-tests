@@ -6,6 +6,7 @@ import Signup from './components/Signup'
 import Mentions from "./components/Mentions";
 import Alerts from "./components/Alerts";
 import Signin from "./components/Signin";
+import Profile from './components/Profile'
 
 
 import { ThemeProvider } from '@material-ui/core/styles'
@@ -42,8 +43,6 @@ function App() {
     const checkUser = async () => {
         let authorizedUser;
         authorizedUser = await Auth.currentAuthenticatedUser()
-        const token = authorizedUser.signInUserSession.accessToken.jwtToken
-        localStorage.setItem('token', token)
         if (!user) {
             setUser(authorizedUser)
         }
@@ -78,7 +77,8 @@ function App() {
                     <Route exact path='/signup' render={(props) =>  <Signup {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} token={userToken} setUser={setUser}/>} />
                     <Route exact path='/mentions' render={(props) =>  <Mentions {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
                     <Route exact path='/alerts' render={(props) =>  <Alerts {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
-                    <Route exact path='/signin' render={(props) =>  <Signin {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                    {!user && <Route exact path='/signin' render={(props) =>  <Signin {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />}
+                    <Route exact path='/profile' render={(props) =>  <Profile {...props} user={user} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
                 </Switch>
              </BrowserRouter>
             </UserContext.Provider>

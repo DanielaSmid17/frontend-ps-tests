@@ -55,6 +55,12 @@ export default createMuiTheme({
             fontWeight: 800,
             color: myGrey
 
+        },
+        body1: {
+            fontFamily: genFont,
+            fontSize: '12px',
+            fontWeight: 700,
+            color: 'black'
         }
     }
 })
