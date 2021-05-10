@@ -177,6 +177,7 @@ export default function Header(props) {
         // {name: "Profile", link:"/profile", activeIndex: 1, ariaOwns: anchorEl ? "simple-menu" : undefined, ariaPopUp: anchorEl ? true : undefined, mouseOver: e => handleMenuClick(e)  },
         {name: "Mentions", link:"/mentions", activeIndex: 1},
         {name: "Alerts", link:"/alerts", activeIndex: 2},
+        {name: "Podcasts", link:"/podcasts", activeIndex: 3},
         {name: "API", link:"/api", activeIndex: 4},
         {name: "FAQ", link:"/faq", activeIndex: 5},
     ]

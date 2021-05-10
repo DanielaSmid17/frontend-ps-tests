@@ -73,59 +73,74 @@ function Alerts(props) {
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const alertsTable = (
+        <React.Fragment>
+            <Table style={{width: matchesSM ? 200 :  matchesMD ? 400 : 500}}>
+                <TableContainer>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><Checkbox size={matchesSM ? 'small' : 'medium'} /></TableCell>
+                            {alertHeaders.map((option) => (
+                                <TableCell className={classes.tableCell} style={{color: theme.palette.secondary.dark}}>{option}</TableCell>))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {alertsOptions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((alert) =>(
+                            <TableRow>
+                                <TableCell><Checkbox name="checkedC" size={matchesSM ? 'small' : 'medium'} /></TableCell>
+                                <TableCell className={classes.tableCell}>{alert.keyword}</TableCell>
+                                <TableCell className={classes.tableCell}>{alert.type} </TableCell>
+                                <TableCell className={classes.tableCell}>{alert.created}</TableCell>
+                            </TableRow>))}
+                    </TableBody>
+                </TableContainer>
+            </Table>
+        </React.Fragment>
+    )
+
+    const alertButtons = (
+        <React.Fragment>
+            <Grid item container direction='row' lg style={{marginTop: '2em', width:'50%'}} justify='center'>
+                <Grid item>
+                    <Button className={classes.alertButton} onClick={handleDialogClickOpen} style={{backgroundColor: theme.palette.secondary.dark, color: 'white'}}>Add<AddIcon style={{fontSize: 'small', color: 'white'}}/></Button>
+                </Grid>
+                <Grid item>
+                    <Button className={classes.alertButton} style={{backgroundColor: theme.palette.primary.dark, color: 'white'}}>Delete<RemoveIcon style={{fontSize: 'small', color: 'white'}} /></Button>
+                </Grid>
+            </Grid>
+        </React.Fragment>
+    )
+
 
     return (
         <Grid container direction='column' alignItems='center' style={{width: '90%', marginLeft: matchesSM ? '1em' : '6em'}}>
-            <Grid item style={{marginTop: matchesSM ? '2.5em' : undefined}}>
+            <Grid item style={{marginTop: matchesSM ? '2.5em' : undefined, marginLeft: matchesMD ? '4em' : undefined}}>
                 <Typography variant='h3'>Your Alerts</Typography>
             </Grid>
-            <Hidden lgUp>
-                <Grid item container direction='row' lg style={{marginTop: '2em', width:'40%'}} justify='center'>
+            <Hidden mdDown>
+                <Grid item container direction='row' style={{marginTop: '2em', width:'40%'}}>
                     <Grid item>
-                        <Button className={classes.alertButton} onClick={handleDialogClickOpen} style={{backgroundColor: theme.palette.secondary.dark, color: 'white'}}>Add<AddIcon style={{fontSize: 'small', color: 'white'}}/></Button>
+                        {alertsTable}
                     </Grid>
                     <Grid item>
-                        <Button className={classes.alertButton} style={{backgroundColor: theme.palette.primary.dark, color: 'white'}}>Delete<RemoveIcon style={{fontSize: 'small', color: 'white'}} /></Button>
+                        {alertButtons}
                     </Grid>
+
                 </Grid>
             </Hidden>
-            <Grid item container direction='row' style={{marginLeft: matchesSM ? '7.75em' : '10em', marginTop: matchesMD ? '1em' : '3em'}}>
-                <Grid item lg align='right' style={{marginRight: matchesSM ? 0 : '3em'}}>
-                    <Table style={{width: matchesSM ? 200 :  matchesMD ? 400 : 500}}>
-                    <TableContainer>
-                        <TableHead>
-                          <TableRow>
-                              <TableCell><Checkbox size={matchesSM ? 'small' : 'medium'} /></TableCell>
-                              {alertHeaders.map((option) => (
-                                  <TableCell className={classes.tableCell} style={{color: theme.palette.secondary.dark}}>{option}</TableCell>))}
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                           {alertsOptions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((alert) =>(
-                           <TableRow>
-                               <TableCell><Checkbox name="checkedC" size={matchesSM ? 'small' : 'medium'} /></TableCell>
-                               <TableCell className={classes.tableCell}>{alert.keyword}</TableCell>
-                               <TableCell className={classes.tableCell}>{alert.type} </TableCell>
-                               <TableCell className={classes.tableCell}>{alert.created}</TableCell>
-                          </TableRow>))}
-                        </TableBody>
-                    </TableContainer>
-                    </Table>
-                </Grid>
-                <Hidden mdDown>
-                <Grid item container direction='row' lg style={{marginTop: '1rem', width: '50%'}}>
+            <Hidden lgUp>
+                <Grid item container direction='column' alignItems='center'>
                     <Grid item>
-                        <Button className={classes.alertButton} onClick={handleDialogClickOpen} style={{backgroundColor: theme.palette.secondary.dark, color: 'white'}}>Add<AddIcon style={{fontSize: 'medium', color: 'white'}}/></Button>
+                        {alertButtons}
                     </Grid>
                     <Grid item>
-                        <Button className={classes.alertButton} style={{backgroundColor: theme.palette.primary.dark, color: 'white'}}>Delete<RemoveIcon style={{fontSize: 'medium', color: 'white'}} /></Button>
+                        {alertsTable}
                     </Grid>
                 </Grid>
-                </Hidden>
-            </Grid>
+
+            </Hidden>
             <AddAlertDialog  open={openDialog} onClose={handleDialogClose} />
         </Grid>
-
 
     );
 }

@@ -12,8 +12,11 @@ import Paper from'@material-ui/core/Paper'
 import {authUrlBase} from './utils/urls.js'
 import Popover from '@material-ui/core/Popover';
 
+import googleIcon from '../components/ui/images/google-icon.svg'
+
 
 import axios from 'axios'
+import {transform} from "@progress/kendo-drawing/geometry";
 
 const useStyles = makeStyles(theme => ({
     popover: {
@@ -22,6 +25,14 @@ const useStyles = makeStyles(theme => ({
     paper: {
         padding: theme.spacing(1),
     },
+    googleButton: {
+        color: theme.palette.secondary.dark,
+        fontFamily: 'Raleway',
+        "&:hover": {
+            backgroundColor: 'transparent'
+        }
+    }
+
 
 
 }))
@@ -59,7 +70,7 @@ function Signin(props) {
         const {email, password} = formState
         try{
         const signUpUser = await Auth.signUp({username: email, password, attributes: {email}})
-        setUserInfo({clientId: signUpUser["user"]["pool"]["clientId"], email: signUpUser["user"]["username"]})
+        setUserInfo({clientId: signUpUser["user"]["pool"]["clientId"], email: signUpUser["user"]["username"], token: signUpUser["user"]['storage']['CognitoIdentityServiceProvider.v0nq04re4qj0csldjcah7vfr4.bb728f4b-11a6-44a0-b81e-57c03855e16c.accessToken']})
         setFormState(() => ({...formState, formType: 'confirmSignUp'}))
         setSignUpError('')
         } catch (err) {
@@ -77,11 +88,16 @@ function Signin(props) {
             if (success) {
                 const {clientId, email} = userInfo
                 try {
-
-                  const userinDB = await axios.post(`${authUrlBase}/signup`, {clientId, email})
-                    console.log(userinDB)
+                    let config = {
+                        headers: {
+                            Authorization: `Bearer ${userInfo.token}`
+                        }
+                    }
+                  console.log(clientId, email, config)
+                  const userinDB = await axios.post(`${authUrlBase}/signup`, {clientId, email}, config)
+                  console.log(userinDB)
                 } catch (err) {
-                    console.log(err)
+                    console.log('error:', err)
                 }
             }
         } catch(err) {
@@ -151,6 +167,8 @@ function Signin(props) {
                 {signUpError && <Typography variant='body2' style={{color: theme.palette.common.red}}>{signUpError}</Typography>}
                 <FormHelperText  style={{fontFamily: 'Raleway', fontWeight: 700}}>Already have an account? <Button style={{backgroundColor:'white', color: theme.palette.secondary.dark}} onClick={() => setFormState(() => ({ ...formState, formType: 'signIn' })) }>Sign in</Button></FormHelperText>
                 <Button onClick={handleSignUp} style={{backgroundColor: theme.palette.primary.light, color: 'white', fontFamily: 'Raleway'}}>Sign up</Button>
+                <Typography variant={"body2"} style={{marginTop: '1em', marginBottom: '1em'}}>or</Typography>
+                <Button className={classes.googleButton} onClick={()=> Auth.federatedSignIn({provider: 'Google'})}>Sign up with  <img style={{marginLeft: '.5em'}} src={googleIcon} alt='google icon' height='20 px' width='20px'/></Button>
             </FormControl>
 
         </React.Fragment>

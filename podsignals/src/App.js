@@ -7,6 +7,7 @@ import Mentions from "./components/Mentions";
 import Alerts from "./components/Alerts";
 import Signin from "./components/Signin";
 import Profile from './components/Profile'
+import Podcasts from './components/Podcasts'
 
 
 import { ThemeProvider } from '@material-ui/core/styles'
@@ -14,6 +15,7 @@ import theme from './components/ui/Theme'
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import UserContext from "./context/UserContext";
 import {Auth} from "aws-amplify";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 
 
@@ -21,6 +23,10 @@ function App() {
     const [mentions, setMentions] = useState([])
     const [userToken, setUserToken] = useState('')
     const [user, setUser] = useState(null)
+    const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
+    const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
+    const matchesXS = useMediaQuery(theme.breakpoints.down('xs'))
+
     const getData=()=>{
         fetch('MOCK_DATA.json'
             ,{
@@ -49,9 +55,21 @@ function App() {
         return authorizedUser
     }
 
+    const checkSizes = () => {
+        if (matchesMD)
+            console.log('medium')
+        else if (matchesSM)
+            console.log('small')
+        else if (matchesXS)
+            console.log('extra small')
+        else
+            console.log('lg')
+    }
+
 
     useEffect(() => {
         getData()
+        checkSizes()
         checkUser()
             .then(user => {
                 console.log(user)
@@ -63,7 +81,7 @@ function App() {
             setUserToken(token)
         }
 
-    }, [user])
+    }, [user, matchesSM, matchesXS, matchesMD])
 
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [value, setValue] = useState(0)
@@ -79,6 +97,7 @@ function App() {
                     <Route exact path='/alerts' render={(props) =>  <Alerts {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
                     {!user && <Route exact path='/signin' render={(props) =>  <Signin {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />}
                     <Route exact path='/profile' render={(props) =>  <Profile {...props} user={user} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                    <Route exact path='/podcasts' render={(props) =>  <Podcasts {...props} user={user} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
                 </Switch>
              </BrowserRouter>
             </UserContext.Provider>

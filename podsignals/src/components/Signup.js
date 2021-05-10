@@ -4,6 +4,8 @@ import Button from "@material-ui/core/Button";
 import {useTheme, makeStyles} from "@material-ui/core/styles";
 import Grid from '@material-ui/core/Grid'
 import axios from 'axios'
+import {authUrlBase} from './utils/urls.js'
+import Typography from "@material-ui/core/Typography";
 
 
 
@@ -51,8 +53,18 @@ function Signup(props) {
         const user = await Auth.currentAuthenticatedUser()
         props.setUser(user)
         token = user.signInUserSession.accessToken.jwtToken
-        localStorage.setItem('token', token)
         console.log(user, token)
+    }
+
+    const checkLambda = async () => {
+        const token = localStorage.getItem('token')
+        let config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        const data = await axios.post(`${authUrlBase}/auth-access`,{}, config)
+        alert(data.data.message)
     }
 
     useEffect(() =>{
@@ -61,7 +73,7 @@ function Signup(props) {
 
 
     return (
-        <Grid container direction='column'>
+        <Grid container direction='column' style={{marginTop: '4em'}}>
             <Grid item container direction='row' justify='center'>
                 <Button className={classes.signupButton} onClick={signin}>Sign in with Google</Button>
                 <Button className={classes.signupButton} onClick={() => {
@@ -73,6 +85,8 @@ function Signup(props) {
                     Auth.signOut();
                     props.setUser('')
                 }}>Sign out</Button>
+                <Button className={classes.signupButton} onClick={checkLambda}>Check lambda</Button>
+
             </Grid>
         </Grid>
     );

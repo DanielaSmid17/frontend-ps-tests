@@ -19,10 +19,10 @@ const useStyles = makeStyles(theme => ({
         maxWidth: 1200,
         width: 1000,
         [theme.breakpoints.down('md')] : {
-            width: 400
+            width: 500
         },
         [theme.breakpoints.down('sm')] : {
-            width: 200
+            width: 300
         }
     },
     iconButton: {
@@ -42,10 +42,9 @@ function MentionsTable(props) {
     const theme = useTheme()
     const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
 
-    const [play, setPlay] = useState(false)
-
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [play, setPlay] = useState({})
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(matchesMD ? 5 : 10);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -60,6 +59,11 @@ function MentionsTable(props) {
     const mdTableHeaders = ["Mention", "Pod", "Play"]
 
     const headerTableRender = matchesMD ? mdTableHeaders : tableHeaders
+    const handlePlayChange = (idx) => {
+
+        if(play[idx]) setPlay({})
+        else setPlay({[idx] : true})
+    }
 
     const tableRows = (
         <React.Fragment>
@@ -68,7 +72,7 @@ function MentionsTable(props) {
                     <TableCell key={option} className={classes.tableCell} style={{color: theme.palette.secondary.dark}}>{option}</TableCell>
                 ))}
             </TableRow>
-            {props.mentions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((mention) =>(
+            {props.mentions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((mention, idx) =>(
                 <TableRow key={mention}>
                     {!matchesMD && <TableCell className={classes.tableCell}>{mention.date}</TableCell>}
                     <TableCell className={classes.tableCell}>{mention.mention}</TableCell>
@@ -85,7 +89,7 @@ function MentionsTable(props) {
                     {!matchesMD && <TableCell className={classes.tableCell}>{mention.episode}</TableCell>}
                     {!matchesMD && <TableCell className={classes.tableCell}>{mention.time.split(' ')[0]}</TableCell>}
                     {!matchesMD && <TableCell className={classes.tableCell}>{mention.podcast}</TableCell>}
-                    <TableCell className={classes.tableCell}><Button className={classes.iconButton} style={{marginLeft: '-1em'}}>{!play ? <PlayArrowIcon style={{fontSize: 'small'}}/> : <PauseIcon style={{fontSize: 'small'}}/>}</Button></TableCell>
+                    <TableCell className={classes.tableCell}><Button className={classes.iconButton} onClick={() => handlePlayChange(idx)} style={{marginLeft: '-1em'}}>{!play[idx] ? <PlayArrowIcon style={{fontSize: 'small'}}/> : <PauseIcon style={{fontSize: 'small'}}/>}</Button></TableCell>
                 </TableRow>
             ))}
         </React.Fragment>
@@ -100,7 +104,7 @@ function MentionsTable(props) {
                     </TableBody>
                 </Table>
             <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
+                rowsPerPageOptions={[5, 10, 25, 100]}
                 component="div"
                 count={props.mentions.length}
                 rowsPerPage={rowsPerPage}
