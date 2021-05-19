@@ -52,7 +52,7 @@ const alertsOptions = [
     {keyword: 'Strauss', type: 'SMS', created: '30.03.20'},
 ]
 const alertHeaders = ['Keyword', 'Alert type', 'Created on']
-
+  
 
 function Alerts(props) {
 
@@ -62,7 +62,7 @@ function Alerts(props) {
         setOpenDialog(true);
     };
 
-    const handleDialogClose = (value) => {
+    const handleDialogClose = () => {
         setOpenDialog(false);
     };
 
@@ -100,7 +100,7 @@ function Alerts(props) {
 
     const alertButtons = (
         <React.Fragment>
-            <Grid item container direction='row' lg style={{marginTop: '2em', width:'50%'}} justify='center'>
+            <Grid item container direction='row' lg style={{marginTop: '1em', width: 168}} justify='center'>
                 <Grid item>
                     <Button className={classes.alertButton} onClick={handleDialogClickOpen} style={{backgroundColor: theme.palette.secondary.dark, color: 'white'}}>Add<AddIcon style={{fontSize: 'small', color: 'white'}}/></Button>
                 </Grid>
@@ -118,7 +118,7 @@ function Alerts(props) {
                 <Typography variant='h3'>Your Alerts</Typography>
             </Grid>
             <Hidden mdDown>
-                <Grid item container direction='row' style={{marginTop: '2em', width:'40%'}}>
+                <Grid item container direction='row' justify='center' style={{marginTop: '2em'}}>
                     <Grid item>
                         {alertsTable}
                     </Grid>

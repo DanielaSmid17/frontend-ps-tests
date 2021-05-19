@@ -65,6 +65,8 @@ function AddAlertDialog(props) {
     const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
     const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
 
+
+
     const [keyWord, setKeyword] = useState('')
     const [alertType, setAlertType] = useState({
         email: false,
@@ -79,6 +81,7 @@ function AddAlertDialog(props) {
 
     const handleAlertTypeChange = (event) => {
         setAlertType({ ...alertType, [event.target.name]: event.target.checked });
+        console.log(alertType)
     };
 
 
@@ -112,7 +115,7 @@ function AddAlertDialog(props) {
                             id='name'
                             value={keyWord}
                             onChange={(e) => setKeyword(e.target.value)}
-                            label=<Typography variant='body1' style={{fontSize: '12px'}}>Type here your Key Word </Typography>
+                            label={<Typography variant='body1' style={{fontSize: '12px'}}>Type here your Key Word </Typography>}
                         />
                     </Grid>
                     <Grid item>

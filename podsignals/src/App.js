@@ -11,11 +11,32 @@ import Podcasts from './components/Podcasts'
 
 
 import { ThemeProvider } from '@material-ui/core/styles'
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+
 import theme from './components/ui/Theme'
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import UserContext from "./context/UserContext";
 import {Auth} from "aws-amplify";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from } from '@apollo/client'
+import {onError} from '@apollo/client/link/error'
+
+const errorLink = onError(({graphqlErrors, networkError}) => {
+    if (graphqlErrors) {
+        graphqlErrors.map(({message, location, path}) => {
+            alert(`Graphql error: ${message}`)
+        })
+    }
+})
+
+const link = from([
+    errorLink,
+    new HttpLink({uri: 'https://dg33znohrbhczf3mg2ten4ehxq.appsync-api.us-east-2.amazonaws.com/graphql', credentials: 'same-origin'}) 
+])
+
+const apolloClient = new ApolloClient({
+    cache: new InMemoryCache(),
+    link: link
+})
 
 
 
@@ -37,12 +58,12 @@ function App() {
             }
         )
             .then(function(response){
-                console.log(response)
+
                 return response.json();
             })
             .then(function(myJson) {
                 setMentions(myJson)
-                console.log(myJson);
+
             });
     }
 
@@ -86,22 +107,24 @@ function App() {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [value, setValue] = useState(0)
     return (
-        <ThemeProvider theme={theme}>
-            <UserContext.Provider value={{user, setUser}}>
-             <BrowserRouter>
-                <Header value={value} setValue={setValue} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} user={user} setUser={setUser}/>
-                <Switch>
-                    <Route exact path='/dashboard' render={(props) =>  <Dashboard {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
-                    <Route exact path='/signup' render={(props) =>  <Signup {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} token={userToken} setUser={setUser}/>} />
-                    <Route exact path='/mentions' render={(props) =>  <Mentions {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
-                    <Route exact path='/alerts' render={(props) =>  <Alerts {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
-                    {!user && <Route exact path='/signin' render={(props) =>  <Signin {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />}
-                    <Route exact path='/profile' render={(props) =>  <Profile {...props} user={user} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
-                    <Route exact path='/podcasts' render={(props) =>  <Podcasts {...props} user={user} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
-                </Switch>
-             </BrowserRouter>
-            </UserContext.Provider>
-        </ThemeProvider>
+        <ApolloProvider client={apolloClient}>
+            <ThemeProvider theme={theme}>
+                <UserContext.Provider value={{user, setUser}}>
+                <BrowserRouter>
+                    <Header value={value} setValue={setValue} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} user={user} setUser={setUser}/>
+                    <Switch>
+                        <Route exact path='/dashboard' render={(props) =>  <Dashboard {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                        <Route exact path='/signup' render={(props) =>  <Signup {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} token={userToken} setUser={setUser}/>} />
+                        <Route exact path='/mentions' render={(props) =>  <Mentions {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                        <Route exact path='/alerts' render={(props) =>  <Alerts {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                        {!user && <Route exact path='/signin' render={(props) =>  <Signin {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />}
+                        <Route exact path='/profile' render={(props) =>  <Profile {...props} user={user} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                        <Route exact path='/podcasts' render={(props) =>  <Podcasts {...props} user={user} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
+                    </Switch>
+                </BrowserRouter>
+                </UserContext.Provider>
+            </ThemeProvider>
+        </ApolloProvider>
 
 
     );

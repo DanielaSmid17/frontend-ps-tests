@@ -12,39 +12,100 @@ import Button from '@material-ui/core/Button'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
+import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
+import TextField from '@material-ui/core/TextField'
+import Box from '@material-ui/core/Box'
+import Link from '@material-ui/core/Link'
+import { InputLabel } from '@material-ui/core';
+
+
+import Amplify, { API, graphqlOperation } from 'aws-amplify'
+import { getPodcastById, getTopPodcasts, getPodcastsByKeyword, getEvent, getCategories } from '../GraphQL/Queries';
+import { ApolloProvider } from '@apollo/client';
+// import { useQuery, gql } from '@apollo/client'
+// import {getPodcast} from '../GraphQL/Queries'
 
 
 const useStyles = makeStyles(theme => ({
     root: {
         maxWidth: 345,
+        marginLeft: '2em'
     },
     media: {
         height: 120,
         paddingTop: '56.25%', // 16:9
       },
+    actionButtons: {
+        fontFamily: 'Raleway', 
+        color: theme.palette.secondary.dark,
+        '&:hover': {
+            backgroundColor: 'transparent'
+        }
+    }
 }))
 
 function Podcasts(props) {
     const classes = useStyles()
     const theme = useTheme()
-    const podcasts = [
-        {category: 'Art', rank: 1, title: 'Fresh Air', link: `https://chartable.com/podcasts/fresh-air`, publisher: 'NPR', description: "Fresh Air from WHYY, the Peabody Award-winning weekday magazine of contemporary arts and issues, is one of public radio's most popular", website: 'http://www.npr.org/programs/fresh-air/', itunes_url: 'https://itunes.apple.com/us/podcast/id214089682?at=1001lMGa&ct=podcast%3ApJk0P8W1', logo: 'https://media.npr.org/assets/img/2018/08/03/npr_freshair_podcasttile_sq-bb34139df91f7a48120ddce9865817ea11baaf32.jpg?s=1400'}
-    ]
-    const ITEM_HEIGHT = 48;
-    const ITEM_PADDING_TOP = 8;
-     const MenuProps = {
-        PaperProps: {
-          style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-          },
-        },
-      };
 
+    const [topPodcasts, setTopPodcasts] = useState([])
+    const [podcastsByWord, setPodcastsByWord] = useState([])
     const [searchCategories, setSearchCategories] = useState([])
+    const [categories, setCategories] = useState([])
+    const [searchValue, setSearchValue] = useState('')
+    const [noResults, setNoResults] = useState(false)
 
-    const [categories, setCategories] = useState(['Art', 'Business', 'Comedy', 'Education', 'Family and Kids', 'Government', 'Health and fitness', 'History', 'Leisure', 'Music', 'News', 'Religion and Spirituality', 'Science', 'Society and Culture', 'Sports', 'Technology', 'TV and Films'])
+    // const {error, loading, data} = useQuery(getPodcast)
+
+    useEffect(() => {
+        fetchPodcasts()
+        fetchCategories()
+    }, [])
+
+    const fetchPodcasts = async () => {
+     
+        try {
+            const podcastData = await API.graphql(graphqlOperation(getTopPodcasts))
+            const topPodcastsData = podcastData.data.getTopOnePodcasts
+            setTopPodcasts(topPodcastsData)
+          } catch (err) { console.log(err) }
+
+    }
+
+    const fetchCategories = async () => {
+        try {
+            const categoriesData = await API.graphql(graphqlOperation(getCategories))
+            const categoriesObject = categoriesData.data.getCategories
+            let categories = []
+            categoriesObject.map((category) => (
+                categories.push(category.category_name)
+            ))
+
+            setCategories(categories)
+        } catch (err) { console.log(err) }
+    }
+
+    const fetchPodcastsByKeyword = async () => {
+        if (searchValue.length >= 3){
+        try{
+            const podcastData = await API.graphql(graphqlOperation(getPodcastsByKeyword, {keyword: searchValue}))
+            const podcasts = podcastData.data.getPodcastsByKeyword
+            if (podcasts.length === 0) 
+                setNoResults(true)
+            else 
+                setNoResults(false)
+            setPodcastsByWord(podcasts)
+        } catch (err) { console.log(err) }
+    }
+    }
+
+    const handleKeyWordChange = e => {
+        setSearchValue(e.target.value)
+        setNoResults(false)
+    }
+
+
 
     const handleCategoryChange = (e) => {
         const searchCategoriesCopy = [...searchCategories]
@@ -61,56 +122,127 @@ function Podcasts(props) {
         searchCategoriesCopy.splice(index, 1)
         setSearchCategories(searchCategoriesCopy)
     }
+    
 
     return (
         <Grid container direction='column' style={{width: '90%', marginLeft: '10em', marginTop: '5em'}}>
             <Grid item align='center'>
                 <Typography variant='h3'>Podcasts</Typography>
             </Grid>
-            <Grid item container direction='column' align='center'>
-                <Grid item>
-                    <Typography variant='body1'>Advanced search</Typography>
-                </Grid>
-                <Grid item>
-                    <Select
-                        labelId="demo-mutiple-chip-label"
-                        id="demo-mutiple-chip"
-                        onChange={handleCategoryChange}
-                        input={<Input id="select-multiple-chip" />}
-                        >
-                        {categories.map((category) => (
-                            <MenuItem key={category} value={category} >
-                            {category}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </Grid>
-                <Grid item>
-                    {searchCategories.map((category) => (
-                        <Chip size="small" label={category} onDelete={handleCategoryDelete}/>
-                    ))}
-                </Grid>  
+            <Grid item container direction='column' alignItems='center'align='center'>
+                <Paper style={{width: '50%', marginTop: '2em'}} elevation={3}>
+                    <Grid item style={{marginTop: '1.5em'}}>
+                        <Typography variant='h2'>Advanced search</Typography>
+                    </Grid>
+                    <Grid item container justify='center' style={{marginTop: '1em'}}>
+                        <Grid item>
+                            <InputLabel>Filter by Category</InputLabel>
+                        </Grid>
+                        <Grid item container direction='column' justify='center'>
+                            <Grid item style={{marginTop: '0.4em'}}>
+                            <Select
+                            style={{width: 140}}
+                                labelId="demo-mutiple-chip-label"
+                                id="demo-mutiple-chip"
+                                onChange={handleCategoryChange}
+                                input={<Input id="select-multiple-chip" />}
+                                >
+                                {categories.map((category) => (
+                                    <MenuItem key={category} value={category} >
+                                    {category}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            </Grid>
+                    
+                        <Grid item style={{marginTop: '0.4em'}}>
+                            {searchCategories.map((category) => (
+                                <Chip
+                                variant='outlined' 
+                                size="medium" label={category} 
+                                onDelete={handleCategoryDelete}
+                                style={{fontFamily: 'Raleway', fontWeight: 700
+                            }}/>
+                            ))}
+                            </Grid> 
+                        </Grid>
+                            <Grid item container direction='column'>
+                            <Grid item>
+                                <TextField style={{width: 140}} label="What interests you?" onChange={handleKeyWordChange} value={searchValue} />
+                            </Grid>
+                            <Grid item>
+                                {searchValue.length < 3 && searchValue.length > 0 && <Typography variant='body1'>Search must include at least three characters</Typography>}
+                                <Button onClick={fetchPodcastsByKeyword} style={{backgroundColor: theme.palette.primary.light, marginBottom: '2em', marginTop: '1em', color: 'white', height: '40px', fontFamily: 'Raleway'}} >Search</Button>
+                            </Grid>
+                        </Grid>
+                      
+                    </Grid> 
+                </Paper> 
             </Grid>
-            <Grid item>
-                <Card className={classes.root}>
-                    <CardHeader 
-                    title={<Typography variant='h2' style={{fontWeight: 1000}}>{podcasts[0].title}</Typography>} 
-                    subheader={<Typography variant='body2' style={{color: theme.palette.primary.dark, fontSize: '18px'}}>{podcasts[0].category}</Typography>} 
-                    avatar={<Avatar variant="rounded" style={{backgroundColor: theme.palette.secondary.dark}}>#{podcasts[0].rank}</Avatar>}/>
-                    <CardMedia className={classes.media} image={podcasts[0].logo}/>
-                    <CardContent>
-                        <Typography variant='body1'>
-                            {podcasts[0].description}
-                        </Typography>
-                        <Typography variant='body2' style={{marginTop: '1em'}}>
-                            Published by: {podcasts[0].publisher}
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                    <Button size="small" style={{fontFamily: 'Raleway', color: theme.palette.secondary.dark}} href={podcasts[0].website} target='_blank'>Go to website</Button>
-                    <Button size="small" style={{fontFamily: 'Raleway', color: theme.palette.secondary.dark}} href={podcasts[0].itunes_url} target='_blank'>Listen in iTunes</Button>
-                    </CardActions>
-                </Card>
+            <Grid item container direction='row' style={{marginTop: '2em', marginBottom: '1em'}} spacing={3}>
+                {!searchValue && topPodcasts.map((podcast) => (
+                    <Grid item lg={4}>
+                        <Card className={classes.root}>
+                        <CardHeader 
+                        title={<Typography variant='h2' style={{fontWeight: 1000}}>{podcast.title}</Typography>} 
+                        subheader={<Typography variant='body2' style={{color: theme.palette.primary.dark, fontSize: '18px'}}>{podcast.category}</Typography>} 
+                        avatar={<Avatar variant="rounded" style={{backgroundColor: theme.palette.secondary.dark}}>#{podcast.category_rank}</Avatar>}/>
+                        <Link href={podcast.website} target='_blank'>
+                            <CardMedia className={classes.media} image={podcast.logo} />
+                        </Link>
+                        <CardContent>
+                            <Box textOverflow="ellipsis" overflow="hidden" style={{height: 50}}> 
+                                <Typography variant='body1' paragraph>
+                                    {podcast.description}
+                                </Typography>
+                            </Box>
+            
+                            <Typography variant='body2' style={{marginTop: '1em'}}>
+                                Publisher: {podcast.publisher}
+                            </Typography>
+                
+                        </CardContent>
+                        <CardActions>
+                        <Button size="small" className={classes.actionButtons} href={podcast.website} target='_blank'>Go to website</Button>
+                        <Button size="small" className={classes.actionButtons} href={podcast.itunes_url} target='_blank'>Listen in iTunes</Button>
+                        </CardActions>
+                     </Card>
+                    </Grid>
+
+                ))}
+                        {searchValue && podcastsByWord.map((podcast) => (
+                    <Grid item lg={4}>
+                        <Card className={classes.root}>
+                        <CardHeader 
+                        title={<Typography variant='h2' style={{fontWeight: 1000}}>{podcast.title}</Typography>} 
+                        subheader={<Typography variant='body2' style={{color: theme.palette.primary.dark, fontSize: '18px'}}>{podcast.category}</Typography>} 
+                        avatar={<Avatar variant="rounded" style={{backgroundColor: theme.palette.secondary.dark}}>#{podcast.category_rank}</Avatar>}/>
+                        <Link href={podcast.website} target='_blank'>
+                            <CardMedia className={classes.media} image={podcast.logo} />
+                        </Link>
+                        <CardContent>
+                            <Box textOverflow="ellipsis" overflow="hidden" style={{height: 50}}> 
+                                <Typography variant='body1' paragraph>
+                                    {podcast.description}
+                                </Typography>
+                            </Box>
+            
+                            <Typography variant='body2' style={{marginTop: '1em'}}>
+                                Publisher: {podcast.publisher}
+                            </Typography>
+                
+                        </CardContent>
+                        <CardActions>
+                        <Button size="small" className={classes.actionButtons} href={podcast.website} target='_blank'>Go to website</Button>
+                        <Button size="small" className={classes.actionButtons} href={podcast.itunes_url} target='_blank'>Listen in iTunes</Button>
+                        </CardActions>
+                     </Card>
+                    </Grid>
+                ))}
+                {noResults && 
+                <Grid item container align='center' justify='center'>
+                    <Typography variant='body2' paragraph><span style={{fontWeight: 900}}>We didn't find any results</span> <br/> Make sure everything is spelled correctly or try different keywords.</Typography>
+                </Grid> }
 
             </Grid>
 
