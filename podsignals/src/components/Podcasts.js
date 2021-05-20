@@ -18,6 +18,7 @@ import TextField from '@material-ui/core/TextField'
 import Box from '@material-ui/core/Box'
 import Link from '@material-ui/core/Link'
 import { InputLabel } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 import Amplify, { API, graphqlOperation } from 'aws-amplify'
@@ -55,8 +56,9 @@ function Podcasts(props) {
     const [categories, setCategories] = useState([])
     const [searchValue, setSearchValue] = useState('')
     const [noResults, setNoResults] = useState(false)
+    const [loading, setLoading] = useState(false)
 
-    // const {error, loading, data} = useQuery(getPodcast)
+
 
     useEffect(() => {
         fetchPodcasts()
@@ -68,6 +70,7 @@ function Podcasts(props) {
         try {
             const podcastData = await API.graphql(graphqlOperation(getTopPodcasts))
             const topPodcastsData = podcastData.data.getTopOnePodcasts
+
             setTopPodcasts(topPodcastsData)
           } catch (err) { console.log(err) }
 
@@ -86,16 +89,18 @@ function Podcasts(props) {
         } catch (err) { console.log(err) }
     }
 
-    const fetchPodcastsByKeyword = async () => {
-        if (searchValue.length >= 3){
+    const fetchPodcastsAdvancedSearch = async () => {
+        if (searchValue.length >= 3 || (searchCategories.length >= 1 && (searchValue.length === 0 || searchValue.length >= 3))){
         try{
-            const podcastData = await API.graphql(graphqlOperation(getPodcastsByKeyword, {keyword: searchValue}))
+            setLoading(true)
+            const podcastData = await API.graphql(graphqlOperation(getPodcastsByKeyword, {keyword: searchValue, category: searchCategories.toString()}))
             const podcasts = podcastData.data.getPodcastsByKeyword
+            setLoading(false)
+            setPodcastsByWord(podcasts)
             if (podcasts.length === 0) 
                 setNoResults(true)
             else 
                 setNoResults(false)
-            setPodcastsByWord(podcasts)
         } catch (err) { console.log(err) }
     }
     }
@@ -103,6 +108,7 @@ function Podcasts(props) {
     const handleKeyWordChange = e => {
         setSearchValue(e.target.value)
         setNoResults(false)
+        setPodcastsByWord([])
     }
 
 
@@ -112,6 +118,9 @@ function Podcasts(props) {
         if (!searchCategoriesCopy.includes(e.target.value)){
             searchCategoriesCopy.push(e.target.value)
             setSearchCategories(searchCategoriesCopy)
+            if (searchCategories.length === 0)
+                setPodcastsByWord([])
+               
         }
 
     }
@@ -161,8 +170,7 @@ function Podcasts(props) {
                                 variant='outlined' 
                                 size="medium" label={category} 
                                 onDelete={handleCategoryDelete}
-                                style={{fontFamily: 'Raleway', fontWeight: 700
-                            }}/>
+                                style={{fontFamily: 'Raleway', fontWeight: 700}}/>
                             ))}
                             </Grid> 
                         </Grid>
@@ -172,7 +180,7 @@ function Podcasts(props) {
                             </Grid>
                             <Grid item>
                                 {searchValue.length < 3 && searchValue.length > 0 && <Typography variant='body1'>Search must include at least three characters</Typography>}
-                                <Button onClick={fetchPodcastsByKeyword} style={{backgroundColor: theme.palette.primary.light, marginBottom: '2em', marginTop: '1em', color: 'white', height: '40px', fontFamily: 'Raleway'}} >Search</Button>
+                                <Button onClick={fetchPodcastsAdvancedSearch} style={{backgroundColor: theme.palette.primary.light, marginBottom: '2em', marginTop: '1em', color: 'white', height: '40px', fontFamily: 'Raleway'}} >Search</Button>
                             </Grid>
                         </Grid>
                       
@@ -180,13 +188,14 @@ function Podcasts(props) {
                 </Paper> 
             </Grid>
             <Grid item container direction='row' style={{marginTop: '2em', marginBottom: '1em'}} spacing={3}>
-                {!searchValue && topPodcasts.map((podcast) => (
+                {loading && <Grid item container justify='center'> <CircularProgress color="secondary" /> </Grid>}
+                {(searchValue.length === 0 && podcastsByWord.length === 0 ) && topPodcasts.map((podcast) => (
                     <Grid item lg={4}>
                         <Card className={classes.root}>
                         <CardHeader 
                         title={<Typography variant='h2' style={{fontWeight: 1000}}>{podcast.title}</Typography>} 
                         subheader={<Typography variant='body2' style={{color: theme.palette.primary.dark, fontSize: '18px'}}>{podcast.category}</Typography>} 
-                        avatar={<Avatar variant="rounded" style={{backgroundColor: theme.palette.secondary.dark}}>#{podcast.category_rank}</Avatar>}/>
+                        avatar={<Avatar variant="rounded" style={{backgroundColor: theme.palette.secondary.dark, fontSize: '18px'}}>#{podcast.category_rank}</Avatar>}/>
                         <Link href={podcast.website} target='_blank'>
                             <CardMedia className={classes.media} image={podcast.logo} />
                         </Link>
@@ -210,9 +219,9 @@ function Podcasts(props) {
                     </Grid>
 
                 ))}
-                        {searchValue && podcastsByWord.map((podcast) => (
+                        {(searchValue || searchCategories.length !== 0) && podcastsByWord.map((podcast) => (
                     <Grid item lg={4}>
-                        <Card className={classes.root}>
+                        <Card className={classes.root} key={`${podcast.title}${podcast.category_rank}`}>
                         <CardHeader 
                         title={<Typography variant='h2' style={{fontWeight: 1000}}>{podcast.title}</Typography>} 
                         subheader={<Typography variant='body2' style={{color: theme.palette.primary.dark, fontSize: '18px'}}>{podcast.category}</Typography>} 

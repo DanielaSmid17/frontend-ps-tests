@@ -87,10 +87,10 @@ function Alerts(props) {
                     <TableBody>
                         {alertsOptions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((alert) =>(
                             <TableRow>
-                                <TableCell><Checkbox name="checkedC" size={matchesSM ? 'small' : 'medium'} /></TableCell>
-                                <TableCell className={classes.tableCell}>{alert.keyword}</TableCell>
-                                <TableCell className={classes.tableCell}>{alert.type} </TableCell>
-                                <TableCell className={classes.tableCell}>{alert.created}</TableCell>
+                                <TableCell key='1'><Checkbox name="checkedC" size={matchesSM ? 'small' : 'medium'} /></TableCell>
+                                <TableCell key='1' className={classes.tableCell}>{alert.keyword}</TableCell>
+                                <TableCell key='3' className={classes.tableCell}>{alert.type} </TableCell>
+                                <TableCell key='4' className={classes.tableCell}>{alert.created}</TableCell>
                             </TableRow>))}
                     </TableBody>
                 </TableContainer>

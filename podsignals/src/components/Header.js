@@ -26,12 +26,8 @@ import {Auth} from "aws-amplify";
 function ElevationScroll(props) {
     const { children } = props;
 
-
-
     const trigger = useScrollTrigger({
-        //weather or not there is a little delay
         disableHysteresis: true,
-        // how does does the user have to go in order to trigger the scroll
         threshold: 0
     });
 

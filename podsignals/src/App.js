@@ -76,21 +76,21 @@ function App() {
         return authorizedUser
     }
 
-    const checkSizes = () => {
-        if (matchesMD)
-            console.log('medium')
-        else if (matchesSM)
-            console.log('small')
-        else if (matchesXS)
-            console.log('extra small')
-        else
-            console.log('lg')
-    }
+    // const checkSizes = () => {
+    //     if (matchesMD)
+    //         console.log('medium')
+    //     else if (matchesSM)
+    //         console.log('small')
+    //     else if (matchesXS)
+    //         console.log('extra small')
+    //     else
+    //         console.log('lg')
+    // }
 
 
     useEffect(() => {
         getData()
-        checkSizes()
+        // checkSizes()
         checkUser()
             .then(user => {
                 console.log(user)

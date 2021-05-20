@@ -34,19 +34,18 @@ getTopOnePodcasts {
 }
 `;
 
-export const getPodcastsByKeyword = `
-  query getPodcastsByKeyword($keyword: String!) {
-    getPodcastsByKeyword(keyword: $keyword) {
+export const getPodcastsByKeyword = /* GraphQL */ `
+  query GetPodcastsByKeyword($keyword: String!, $category: String!) {
+    getPodcastsByKeyword(keyword: $keyword, category: $category) {
       id
-      title
       category
       category_rank
+      title
+      publisher
       description
+      website
       itunes_url
       logo
-      publisher
-      rss
-      website
     }
   }
 `;

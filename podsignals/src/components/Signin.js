@@ -93,9 +93,7 @@ function Signin(props) {
                             Authorization: `Bearer ${userInfo.token}`
                         }
                     }
-                  console.log(clientId, email, config)
                   const userinDB = await axios.post(`${authUrlBase}/signup`, {clientId, email}, config)
-                  console.log(userinDB)
                 } catch (err) {
                     console.log('error:', err)
                 }
@@ -134,10 +132,8 @@ function Signin(props) {
                         Authorization: `Bearer ${token}`
                     }
                 }
-                console.log(config)
                 const data = await axios.get(`${authUrlBase}/login`, config)
                 const responseToken = data.data.token
-                console.log(responseToken)
                 if (responseToken){
                     localStorage.setItem('token', responseToken)
                     window.location='/dashboard'

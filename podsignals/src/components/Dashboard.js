@@ -81,7 +81,6 @@ function Dashboard(props) {
         for (const mention in props.mentions) {
             sum += props.mentions[mention].total_mentions
         }
-        console.log(sum)
         setTotalMentions(sum)
 
     }
@@ -92,7 +91,6 @@ function Dashboard(props) {
 
     const topThreeMentions = (mentions) => {
         const top = mentions.sort(dynamicSort("total_mentions")).slice(0, 3)
-        console.log(top)
         setTopMentions(top)
     }
 

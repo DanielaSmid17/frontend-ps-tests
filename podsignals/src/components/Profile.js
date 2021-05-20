@@ -29,13 +29,13 @@ const useStyles = makeStyles(theme => ({
 }))
 
 function Profile(props) {
+
     const classes = useStyles()
     const theme = useTheme()
     const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
     const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
-    // const {name, lastName, email, secretKey} = props.user
     const [userInfo, setUserInfo] = useState({
-        name: '', lastName: '', email: 'dani@podsignals.com', secretKey: 'ab45ne2i2nn2', plan: 'FREE'
+        name: '', lastName: '', email: props.user.attributes.email, secretKey: 'ab45ne2i2nn2', plan: 'FREE'
     })
     const [showSecretKey, setShowSecretKey] = useState(false);
     const handleClickShowPassword = () => setShowSecretKey(!showSecretKey);
