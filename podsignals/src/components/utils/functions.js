@@ -9,3 +9,8 @@ export const dynamicSort = (list) => {
         return result * sortOrder;
     }
 }
+
+export const podcastListSort = (list) => {
+    list.sort((a, b) => (a.category_rank > b.category_rank) ? 1 : -1)
+    return list
+}

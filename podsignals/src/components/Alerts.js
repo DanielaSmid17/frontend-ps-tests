@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import AddAlertDialog from "./AddAlertDialog";
 
 
@@ -17,6 +17,11 @@ import RemoveIcon from '@material-ui/icons/Remove'
 import Checkbox from '@material-ui/core/Checkbox'
 import Typography from '@material-ui/core/Typography'
 import Hidden from '@material-ui/core/Hidden'
+import jwt_decode from "jwt-decode";
+
+import Amplify, { API, graphqlOperation } from 'aws-amplify'
+import { getAlertsByUser } from '../GraphQL/Queries';
+
 
 
 
@@ -55,8 +60,32 @@ const alertHeaders = ['Keyword', 'Alert type', 'Created on']
   
 
 function Alerts(props) {
+    const classes = useStyles()
+    const theme = useTheme()
+    const matchesMD = theme.breakpoints.down('md')
+    const matchesSM = theme.breakpoints.down('sm')
+
+    const token = localStorage.getItem('tokenDB')
+    const user = jwt_decode(token)
+    const clientId = user.Item.client_id
 
     const [openDialog, setOpenDialog] = useState(false);
+
+    const [alerts, setAlerts] = useState([])
+
+    const fetchAlerts = async () => {
+        try{
+            const alertsFetch = await API.graphql(graphqlOperation(getAlertsByUser, clientId))
+            console.log(alertsFetch)
+        } catch(err) {
+            console.log(err)
+        }
+
+    }
+
+    useEffect(() => {
+        fetchAlerts()
+    }, [])
 
     const handleDialogClickOpen = () => {
         setOpenDialog(true);
@@ -66,10 +95,8 @@ function Alerts(props) {
         setOpenDialog(false);
     };
 
-    const classes = useStyles()
-    const theme = useTheme()
-    const matchesMD = theme.breakpoints.down('md')
-    const matchesSM = theme.breakpoints.down('sm')
+
+
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);

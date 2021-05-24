@@ -1,10 +1,14 @@
 import {gql} from '@apollo/client'
 
 export const getPodcastById = /* GraphQL */ `
-  query getPodcastById($id: ID!) {
+  query GetPodcastById($id: ID!) {
     getPodcastById(id: $id) {
       id
-      category
+      category {
+        id
+        category_name
+      }
+      category_id
       category_rank
       title
       publisher
@@ -13,32 +17,21 @@ export const getPodcastById = /* GraphQL */ `
       itunes_url
       logo
       rss
+      page_link
     }
   }
 `;
 
-export const getTopPodcasts = `
-query TopPodcastsEachCategory {
-getTopOnePodcasts {
-    id
-    title
-    category
-    category_rank
-    description
-    itunes_url
-    logo
-    publisher
-    rss
-    website
-  }
-}
-`;
 
-export const getPodcastsByKeyword = /* GraphQL */ `
-  query GetPodcastsByKeyword($keyword: String!, $category: String!) {
-    getPodcastsByKeyword(keyword: $keyword, category: $category) {
+export const getTopOnePodcasts = /* GraphQL */ `
+  query GetTopOnePodcasts {
+    getTopOnePodcasts {
       id
-      category
+      category {
+        id
+        category_name
+      }
+      category_id
       category_rank
       title
       publisher
@@ -46,6 +39,30 @@ export const getPodcastsByKeyword = /* GraphQL */ `
       website
       itunes_url
       logo
+      rss
+      page_link
+    }
+  }
+`;
+
+export const getByCatAndKey = /* GraphQL */ `
+  query GetByCatAndKey($keyword: String!, $category: String!) {
+    getByCatAndKey(keyword: $keyword, category: $category) {
+      id
+      category {
+        id
+        category_name
+      }
+      category_id
+      category_rank
+      title
+      publisher
+      description
+      website
+      itunes_url
+      logo
+      rss
+      page_link
     }
   }
 `;
@@ -57,9 +74,25 @@ export const getEvent = /* GraphQL */ `
 `;
 
 export const getCategories = /* GraphQL */ `
-  query getCategories {
+  query GetCategories {
     getCategories {
+      id
       category_name
+    }
+  }
+`;
+
+export const getAlertsByUser = /* GraphQL */ `
+  query GetAlertsByUser($clientId: String!) {
+    getAlertsByUser(clientId: $clientId) {
+      id
+      client_id
+      created_at
+      type {
+        id
+        type
+      }
+      keyword
     }
   }
 `;

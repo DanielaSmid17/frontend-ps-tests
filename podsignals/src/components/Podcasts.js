@@ -2,12 +2,6 @@ import React, {useEffect, useState} from 'react';
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import {useTheme, makeStyles} from '@material-ui/core/styles'
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -15,15 +9,14 @@ import Input from '@material-ui/core/Input';
 import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
 import TextField from '@material-ui/core/TextField'
-import Box from '@material-ui/core/Box'
-import Link from '@material-ui/core/Link'
 import { InputLabel } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { podcastListSort } from './utils/functions'
 
 
 import Amplify, { API, graphqlOperation } from 'aws-amplify'
-import { getPodcastById, getTopPodcasts, getPodcastsByKeyword, getEvent, getCategories } from '../GraphQL/Queries';
-import { ApolloProvider } from '@apollo/client';
+import { getPodcastById, getTopOnePodcasts, getByCatAndKey, getEvent, getCategories } from '../GraphQL/Queries';
+import PodcastCard from './PodcastCard'
 // import { useQuery, gql } from '@apollo/client'
 // import {getPodcast} from '../GraphQL/Queries'
 
@@ -46,7 +39,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function Podcasts(props) {
+function Podcasts() {
     const classes = useStyles()
     const theme = useTheme()
 
@@ -68,10 +61,11 @@ function Podcasts(props) {
     const fetchPodcasts = async () => {
      
         try {
-            const podcastData = await API.graphql(graphqlOperation(getTopPodcasts))
+            const podcastData = await API.graphql(graphqlOperation(getTopOnePodcasts))
             const topPodcastsData = podcastData.data.getTopOnePodcasts
-
+            console.log(topPodcastsData)
             setTopPodcasts(topPodcastsData)
+
           } catch (err) { console.log(err) }
 
     }
@@ -93,10 +87,12 @@ function Podcasts(props) {
         if (searchValue.length >= 3 || (searchCategories.length >= 1 && (searchValue.length === 0 || searchValue.length >= 3))){
         try{
             setLoading(true)
-            const podcastData = await API.graphql(graphqlOperation(getPodcastsByKeyword, {keyword: searchValue, category: searchCategories.toString()}))
-            const podcasts = podcastData.data.getPodcastsByKeyword
+            const podcastData = await API.graphql(graphqlOperation(getByCatAndKey, {keyword: searchValue, category: searchCategories.toString()}))
+            const podcasts = podcastData.data.getByCatAndKey
             setLoading(false)
-            setPodcastsByWord(podcasts)
+            const sortedList = podcastListSort(podcasts)
+            console.log(sortedList)
+            setPodcastsByWord(sortedList)
             if (podcasts.length === 0) 
                 setNoResults(true)
             else 
@@ -155,6 +151,7 @@ function Podcasts(props) {
                                 id="demo-mutiple-chip"
                                 onChange={handleCategoryChange}
                                 input={<Input id="select-multiple-chip" />}
+                                value={''}
                                 >
                                 {categories.map((category) => (
                                     <MenuItem key={category} value={category} >
@@ -191,61 +188,13 @@ function Podcasts(props) {
                 {loading && <Grid item container justify='center'> <CircularProgress color="secondary" /> </Grid>}
                 {(searchValue.length === 0 && podcastsByWord.length === 0 ) && topPodcasts.map((podcast) => (
                     <Grid item lg={4}>
-                        <Card className={classes.root}>
-                        <CardHeader 
-                        title={<Typography variant='h2' style={{fontWeight: 1000}}>{podcast.title}</Typography>} 
-                        subheader={<Typography variant='body2' style={{color: theme.palette.primary.dark, fontSize: '18px'}}>{podcast.category}</Typography>} 
-                        avatar={<Avatar variant="rounded" style={{backgroundColor: theme.palette.secondary.dark, fontSize: '18px'}}>#{podcast.category_rank}</Avatar>}/>
-                        <Link href={podcast.website} target='_blank'>
-                            <CardMedia className={classes.media} image={podcast.logo} />
-                        </Link>
-                        <CardContent>
-                            <Box textOverflow="ellipsis" overflow="hidden" style={{height: 50}}> 
-                                <Typography variant='body1' paragraph>
-                                    {podcast.description}
-                                </Typography>
-                            </Box>
-            
-                            <Typography variant='body2' style={{marginTop: '1em'}}>
-                                Publisher: {podcast.publisher}
-                            </Typography>
-                
-                        </CardContent>
-                        <CardActions>
-                        <Button size="small" className={classes.actionButtons} href={podcast.website} target='_blank'>Go to website</Button>
-                        <Button size="small" className={classes.actionButtons} href={podcast.itunes_url} target='_blank'>Listen in iTunes</Button>
-                        </CardActions>
-                     </Card>
+                        <PodcastCard podcast={podcast} />
                     </Grid>
 
                 ))}
                         {(searchValue || searchCategories.length !== 0) && podcastsByWord.map((podcast) => (
                     <Grid item lg={4}>
-                        <Card className={classes.root} key={`${podcast.title}${podcast.category_rank}`}>
-                        <CardHeader 
-                        title={<Typography variant='h2' style={{fontWeight: 1000}}>{podcast.title}</Typography>} 
-                        subheader={<Typography variant='body2' style={{color: theme.palette.primary.dark, fontSize: '18px'}}>{podcast.category}</Typography>} 
-                        avatar={<Avatar variant="rounded" style={{backgroundColor: theme.palette.secondary.dark}}>#{podcast.category_rank}</Avatar>}/>
-                        <Link href={podcast.website} target='_blank'>
-                            <CardMedia className={classes.media} image={podcast.logo} />
-                        </Link>
-                        <CardContent>
-                            <Box textOverflow="ellipsis" overflow="hidden" style={{height: 50}}> 
-                                <Typography variant='body1' paragraph>
-                                    {podcast.description}
-                                </Typography>
-                            </Box>
-            
-                            <Typography variant='body2' style={{marginTop: '1em'}}>
-                                Publisher: {podcast.publisher}
-                            </Typography>
-                
-                        </CardContent>
-                        <CardActions>
-                        <Button size="small" className={classes.actionButtons} href={podcast.website} target='_blank'>Go to website</Button>
-                        <Button size="small" className={classes.actionButtons} href={podcast.itunes_url} target='_blank'>Listen in iTunes</Button>
-                        </CardActions>
-                     </Card>
+                        <PodcastCard podcast={podcast} />
                     </Grid>
                 ))}
                 {noResults && 

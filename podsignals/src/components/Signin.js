@@ -9,14 +9,15 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import {useTheme, makeStyles} from '@material-ui/core/styles'
 import Button from "@material-ui/core/Button";
 import Paper from'@material-ui/core/Paper'
-import {authUrlBase} from './utils/urls.js'
+
 import Popover from '@material-ui/core/Popover';
 
 import googleIcon from '../components/ui/images/google-icon.svg'
+import Amplify, { API, graphqlOperation } from 'aws-amplify'
+import { signup, login } from '../GraphQL/Mutations';
 
 
-import axios from 'axios'
-import {transform} from "@progress/kendo-drawing/geometry";
+
 
 const useStyles = makeStyles(theme => ({
     popover: {
@@ -93,7 +94,8 @@ function Signin(props) {
                             Authorization: `Bearer ${userInfo.token}`
                         }
                     }
-                  const userinDB = await axios.post(`${authUrlBase}/signup`, {clientId, email}, config)
+                  const userinDB = await API.graphql(graphqlOperation(signup, {clientId, email}))
+                  console.log(userinDB)
                 } catch (err) {
                     console.log('error:', err)
                 }
@@ -122,22 +124,15 @@ function Signin(props) {
         const { email, password } = formState
         try {
         const signinUser = await Auth.signIn({ username: email, password })
+        const clientId = signinUser.pool.clientId
             setFormState(() => ({...formState, password: '', email: '', authCode: ''}))
             if (signinUser) {
                 setSignInError('')
+                const tokenDB = await API.graphql(graphqlOperation(login, {clientId}))
+                console.log(tokenDB)
+                localStorage.setItem('tokenDB', tokenDB.data.login.token)
+                window.location="/dashboard"
 
-                const token = signinUser["signInUserSession"]["idToken"]["jwtToken"]
-                let config = {
-                    headers:{
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-                const data = await axios.get(`${authUrlBase}/login`, config)
-                const responseToken = data.data.token
-                if (responseToken){
-                    localStorage.setItem('token', responseToken)
-                    window.location='/dashboard'
-                }
             }
 
         } catch (err){

@@ -10,6 +10,7 @@ import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import InputAdornment from '@material-ui/core/InputAdornment'
 import IconButton from '@material-ui/core/IconButton'
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import jwt_decode from "jwt-decode";
 
 const useStyles = makeStyles(theme => ({
     updateButton: {
@@ -28,14 +29,17 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-function Profile(props) {
+function Profile() {
 
     const classes = useStyles()
     const theme = useTheme()
     const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
     const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
+    const token = localStorage.getItem('tokenDB')
+    const userPayload = jwt_decode(token)
+
     const [userInfo, setUserInfo] = useState({
-        name: '', lastName: '', email: props.user.attributes.email, secretKey: 'ab45ne2i2nn2', plan: 'FREE'
+        name: userPayload.Item.name, lastName: userPayload.Item.lastName, email: userPayload.Item.email, secretKey: userPayload.Item.secret_key, plan: 'FREE'
     })
     const [showSecretKey, setShowSecretKey] = useState(false);
     const handleClickShowPassword = () => setShowSecretKey(!showSecretKey);
@@ -43,8 +47,6 @@ function Profile(props) {
     const handleChange = (e) => {
         setUserInfo({...userInfo, [e.target.name] : e.target.value})
     }
-
-
 
     return (
         <Grid container alignItems="center" direction='column' style={{width: matchesSM ? '76%' : '90%', marginLeft: '7em', marginTop: '4em'}}>
@@ -73,6 +75,7 @@ function Profile(props) {
                                 type={showSecretKey ? "text" : "password"}
                                 value={userInfo.secretKey}
                                 style={{width: 200, marginBottom: '1em', fontSize: '20px'}}
+
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">

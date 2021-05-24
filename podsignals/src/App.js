@@ -30,7 +30,7 @@ const errorLink = onError(({graphqlErrors, networkError}) => {
 
 const link = from([
     errorLink,
-    new HttpLink({uri: 'https://dg33znohrbhczf3mg2ten4ehxq.appsync-api.us-east-2.amazonaws.com/graphql', credentials: 'same-origin'}) 
+    new HttpLink({uri: 'https://ruut23zeh5guhdatrzgkqtyg4q.appsync-api.us-east-2.amazonaws.com/graphql', credentials: 'same-origin'}) 
 ])
 
 const apolloClient = new ApolloClient({
