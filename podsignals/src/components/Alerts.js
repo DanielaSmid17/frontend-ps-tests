@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import AddAlertDialog from "./AddAlertDialog";
+import DeleteAlertsDialog from "./DeleteAlertsDialog";
 
 
 import TableContainer from "@material-ui/core/TableContainer";
@@ -17,9 +18,15 @@ import RemoveIcon from '@material-ui/icons/Remove'
 import Checkbox from '@material-ui/core/Checkbox'
 import Typography from '@material-ui/core/Typography'
 import Hidden from '@material-ui/core/Hidden'
-import jwt_decode from "jwt-decode";
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 
-import Amplify, { API, graphqlOperation } from 'aws-amplify'
+
+import jwt_decode from "jwt-decode";
+import { CSVLink } from "react-csv";
+
+
+import { API, graphqlOperation } from 'aws-amplify'
 import { getAlertsByUser } from '../GraphQL/Queries';
 
 
@@ -45,17 +52,15 @@ const useStyles = makeStyles(theme => ({
             fontSize: '12px'
         },
 
+    },
+    dataButton: {
+        fontSize: '12px',
+        fontFamily: 'Raleway',
+        marginLeft: '0.75em',
     }
 
 }))
 
-const alertsOptions = [
-    {keyword: 'Google', type: 'SMS', created: '12.02.21'},
-    {keyword: 'Decathlon', type: 'Email', created: '28.11.20'},
-    {keyword: 'Playtika', type: 'Email', created: '7.09.20'},
-    {keyword: 'Adidas', type: 'SMS', created: '21.05.20'},
-    {keyword: 'Strauss', type: 'SMS', created: '30.03.20'},
-]
 const alertHeaders = ['Keyword', 'Alert type', 'Created on']
   
 
@@ -66,17 +71,21 @@ function Alerts(props) {
     const matchesSM = theme.breakpoints.down('sm')
 
     const token = localStorage.getItem('tokenDB')
-    const user = jwt_decode(token)
-    const clientId = user.Item.client_id
+    const userPayload = jwt_decode(token)
+    const clientId = userPayload.client_id
 
-    const [openDialog, setOpenDialog] = useState(false);
+
+    const [openCreateDialog, setOpenCreateDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const [alerts, setAlerts] = useState([])
+    const [alertsToRemove, setAlertsToRemove] = useState([])
 
     const fetchAlerts = async () => {
         try{
-            const alertsFetch = await API.graphql(graphqlOperation(getAlertsByUser, clientId))
-            console.log(alertsFetch)
+            const alertsFetch = await API.graphql(graphqlOperation(getAlertsByUser, {clientId: clientId}))
+            const alertsList = alertsFetch.data.getAlertsByUser
+            setAlerts(alertsList)
         } catch(err) {
             console.log(err)
         }
@@ -85,16 +94,46 @@ function Alerts(props) {
 
     useEffect(() => {
         fetchAlerts()
-    }, [])
+    }, [openDeleteDialog, openCreateDialog])
 
-    const handleDialogClickOpen = () => {
-        setOpenDialog(true);
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
     };
 
-    const handleDialogClose = () => {
-        setOpenDialog(false);
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
     };
 
+
+    const handleCreateDialogClickOpen = () => {
+        setOpenCreateDialog(true);
+    };
+
+    const handleCreateDialogClose = () => {
+        setOpenCreateDialog(false);
+    };
+    const handleDeleteDialogClickOpen = () => {
+        setOpenDeleteDialog(true);
+    };
+
+    const handleDeleteDialogClickClose = () => {
+        setOpenDeleteDialog(false);
+    };
+
+    
+
+    const handleCheckBoxChange = e => {
+        let alertsToRemoveCopy = [...alertsToRemove]
+        if(alertsToRemoveCopy.includes(e.target.id)) {
+            const index = alertsToRemoveCopy.indexOf(e.target.id)
+            alertsToRemoveCopy.splice(index, 1)
+        } else {
+        alertsToRemoveCopy.push(e.target.id)
+        }
+        setAlertsToRemove(alertsToRemoveCopy)
+        console.log(alertsToRemove)
+    }
 
 
 
@@ -112,16 +151,26 @@ function Alerts(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {alertsOptions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((alert) =>(
-                            <TableRow>
-                                <TableCell key='1'><Checkbox name="checkedC" size={matchesSM ? 'small' : 'medium'} /></TableCell>
-                                <TableCell key='1' className={classes.tableCell}>{alert.keyword}</TableCell>
-                                <TableCell key='3' className={classes.tableCell}>{alert.type} </TableCell>
-                                <TableCell key='4' className={classes.tableCell}>{alert.created}</TableCell>
+                        {alerts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((alert) =>(
+                            <TableRow key={alert.id}>
+                                <TableCell><Checkbox name="checkedC" onChange={handleCheckBoxChange} id={alert.id} size={matchesSM ? 'small' : 'medium'} /></TableCell>
+                                <TableCell className={classes.tableCell}>{alert.keyword}</TableCell>
+                                <TableCell className={classes.tableCell}>{alert.type} </TableCell>
+                                <TableCell className={classes.tableCell}>{alert.created_at.split('T')[0]}</TableCell>
                             </TableRow>))}
                     </TableBody>
                 </TableContainer>
             </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={props.mentions.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                style={{fontFamily: 'Raleway'}}
+            />
         </React.Fragment>
     )
 
@@ -129,13 +178,27 @@ function Alerts(props) {
         <React.Fragment>
             <Grid item container direction='row' lg style={{marginTop: '1em', width: 168}} justify='center'>
                 <Grid item>
-                    <Button className={classes.alertButton} onClick={handleDialogClickOpen} style={{backgroundColor: theme.palette.secondary.dark, color: 'white'}}>Add<AddIcon style={{fontSize: 'small', color: 'white'}}/></Button>
+                    <Button className={classes.alertButton} onClick={handleCreateDialogClickOpen} style={{backgroundColor: theme.palette.secondary.dark, color: 'white'}}>Add<AddIcon style={{fontSize: 'small', color: 'white'}}/></Button>
                 </Grid>
                 <Grid item>
-                    <Button className={classes.alertButton} style={{backgroundColor: theme.palette.primary.dark, color: 'white'}}>Delete<RemoveIcon style={{fontSize: 'small', color: 'white'}} /></Button>
+                    <Button className={classes.alertButton} onClick={handleDeleteDialogClickOpen} style={{backgroundColor: theme.palette.primary.dark, color: 'white'}} disabled={alertsToRemove.length === 0}>Delete<RemoveIcon style={{fontSize: 'small', color: 'white'}} /></Button>
                 </Grid>
             </Grid>
         </React.Fragment>
+    )
+
+    const dataButtons = (
+        <React.Fragment>
+        <Grid item container direction='row' lg style={{marginTop: '1em', width: 168}} justify='center'>
+            <Grid item>
+                <Button className={classes.dataButton}  style={{backgroundColor: theme.palette.secondary.light, color: 'white'}}>Import<ArrowDownwardIcon style={{fontSize: 'small', color: 'white'}}/></Button>
+            </Grid>
+            <Grid item>
+            <CSVLink data={alerts}><Button className={classes.dataButton}  style={{backgroundColor: theme.palette.primary.light, color: 'white', textDecoration: 'none'}}>Export<ArrowUpwardIcon style={{fontSize: 'small', color: 'white'}} /></Button></CSVLink>
+            </Grid>
+        </Grid>
+    </React.Fragment>
+
     )
 
 
@@ -151,6 +214,7 @@ function Alerts(props) {
                     </Grid>
                     <Grid item>
                         {alertButtons}
+                        {dataButtons}
                     </Grid>
 
                 </Grid>
@@ -162,11 +226,13 @@ function Alerts(props) {
                     </Grid>
                     <Grid item>
                         {alertsTable}
+                        {dataButtons}
                     </Grid>
                 </Grid>
 
             </Hidden>
-            <AddAlertDialog  open={openDialog} onClose={handleDialogClose} />
+            <AddAlertDialog  open={openCreateDialog} onClose={handleCreateDialogClose} />
+            <DeleteAlertsDialog  open={openDeleteDialog} onClose={handleDeleteDialogClickClose} alerts={alertsToRemove} />
         </Grid>
 
     );

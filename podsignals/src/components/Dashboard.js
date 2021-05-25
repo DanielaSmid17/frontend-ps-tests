@@ -1,6 +1,4 @@
 import React, {useState, useEffect} from 'react';
-import gql from 'graphql-tag'
-import {useGQLQuery} from "./utils/useGQLQuery";
 import {dynamicSort} from "./utils/functions";
 
 import Table from '@material-ui/core/Table';
@@ -11,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
-import {GridList, Typography} from "@material-ui/core";
+import {Typography} from "@material-ui/core";
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -46,18 +44,6 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-const get_mentions = gql`
-    query{
-      getAllMentions {
-        date
-        mention
-        total_mentions
-        pod
-        episode
-        time
-      }
-    }
-`;
 
 function Dashboard(props) {
     const classes = useStyles()

@@ -1,4 +1,3 @@
-import {gql} from '@apollo/client'
 
 export const getPodcastById = /* GraphQL */ `
   query GetPodcastById($id: ID!) {
@@ -88,10 +87,7 @@ export const getAlertsByUser = /* GraphQL */ `
       id
       client_id
       created_at
-      type {
-        id
-        type
-      }
+      type
       keyword
     }
   }

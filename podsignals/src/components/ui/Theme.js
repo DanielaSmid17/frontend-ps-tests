@@ -2,7 +2,6 @@ import {createMuiTheme} from "@material-ui/core/styles";
 
 const myRed = '#F20544'
 const myBlue = '#05DBF2'
-const myLightGrey = '#A6A6A6'
 const myGrey = '#595959'
 const genFont = 'Raleway'
 const specFont = 'Sacramento'

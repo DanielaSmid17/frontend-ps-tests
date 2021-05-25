@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {
     Chart,
     ChartSeries,
@@ -6,7 +6,7 @@ import {
     ChartCategoryAxis,
     ChartCategoryAxisItem,
     ChartLegend,
-    ChartTitle
+
 } from '@progress/kendo-react-charts';
 
 import 'hammerjs';
@@ -15,7 +15,7 @@ import Grid from '@material-ui/core/Grid'
 
 
 
-function LineChart(props) {
+function LineChart() {
 
 
     const categories = ['24-apr', '25-apr', '26-apr', '27-apr', '28-apr', '29-apr', '30-apr', '01-may'];

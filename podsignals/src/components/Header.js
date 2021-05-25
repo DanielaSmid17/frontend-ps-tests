@@ -10,8 +10,6 @@ import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import {useTheme} from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
 import UserContext from "../context/UserContext";
 
@@ -133,9 +131,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Header(props) {
     const classes = useStyles()
-    const theme = useTheme()
     const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const matches = useMediaQuery(theme.breakpoints.down("md"))
     const { user } = useContext(UserContext)
 
     const [anchorEl, setAnchorEl] = useState(null)
@@ -201,6 +197,7 @@ export default function Header(props) {
             <Tabs
                   onChange={handleTabChange}
                   className={classes.tabContainer}
+                  value={0}
             >
                 {user && <Grid container direction='row' alignItems='center' style={{marginRight: '2em'}}>
                      <Avatar className={classes.avatar}>{user.attributes.email[0].toUpperCase()}</Avatar>
@@ -281,6 +278,7 @@ export default function Header(props) {
                             props.setUser('');
                             window.location='/signin';
                             localStorage.removeItem('token')
+                            localStorage.removeItem('tokenDB')
                         }} style={{fontFamily: 'Raleway', color: 'white', fontSize: '15px'}}>Log out</Button>
                     </ListItem>}
                 </List>

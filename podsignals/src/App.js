@@ -19,6 +19,7 @@ import UserContext from "./context/UserContext";
 import {Auth} from "aws-amplify";
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from } from '@apollo/client'
 import {onError} from '@apollo/client/link/error'
+import { setContext } from '@apollo/client/link/context';
 
 const errorLink = onError(({graphqlErrors, networkError}) => {
     if (graphqlErrors) {
@@ -33,9 +34,21 @@ const link = from([
     new HttpLink({uri: 'https://ruut23zeh5guhdatrzgkqtyg4q.appsync-api.us-east-2.amazonaws.com/graphql', credentials: 'same-origin'}) 
 ])
 
+const authLink = setContext((_, { headers }) => {
+    // get the authentication token from local storage if it exists
+    const token = localStorage.getItem('tokenDB');
+    // return the headers to the context so httpLink can read them
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
+      }
+    }
+  });
+
 const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
-    link: link
+    link: authLink.concat(link)
 })
 
 
@@ -114,7 +127,6 @@ function App() {
                     <Header value={value} setValue={setValue} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} user={user} setUser={setUser}/>
                     <Switch>
                         <Route exact path='/dashboard' render={(props) =>  <Dashboard {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
-                        <Route exact path='/signup' render={(props) =>  <Signup {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} token={userToken} setUser={setUser}/>} />
                         <Route exact path='/mentions' render={(props) =>  <Mentions {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
                         <Route exact path='/alerts' render={(props) =>  <Alerts {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />
                         {!user && <Route exact path='/signin' render={(props) =>  <Signin {...props} mentions={mentions} setValue={setValue} setSelectedIndex={setSelectedIndex} />} />}

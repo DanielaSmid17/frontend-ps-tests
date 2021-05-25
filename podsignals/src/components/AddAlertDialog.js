@@ -14,7 +14,7 @@ import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import FormHelperText from '@material-ui/core/FormHelperText'
 import FormControl from '@material-ui/core/FormControl'
 import Alert from '@material-ui/lab/Alert';
-import Amplify, { API, graphqlOperation } from 'aws-amplify'
+import { API, graphqlOperation } from 'aws-amplify'
 import { createAlert } from '../GraphQL/Mutations';
 import jwt_decode from "jwt-decode";
 
@@ -69,8 +69,8 @@ function AddAlertDialog(props) {
     const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
     const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
     const token = localStorage.getItem('tokenDB')
-    const user = jwt_decode(token)
-    const clientId = user.Item.client_id
+    const userPayload = jwt_decode(token)
+    const clientId = userPayload.client_id
 
 
     const [keyword, setKeyword] = useState('')

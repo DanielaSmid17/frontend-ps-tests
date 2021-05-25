@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {Auth, Hub} from 'aws-amplify'
+import React, {useState} from 'react';
+import {Auth} from 'aws-amplify'
 import Grid from '@material-ui/core/Grid'
 import Typography from "@material-ui/core/Typography";
 import FormControl from "@material-ui/core/FormControl";
@@ -13,7 +13,7 @@ import Paper from'@material-ui/core/Paper'
 import Popover from '@material-ui/core/Popover';
 
 import googleIcon from '../components/ui/images/google-icon.svg'
-import Amplify, { API, graphqlOperation } from 'aws-amplify'
+import { API, graphqlOperation } from 'aws-amplify'
 import { signup, login } from '../GraphQL/Mutations';
 
 
@@ -89,11 +89,7 @@ function Signin(props) {
             if (success) {
                 const {clientId, email} = userInfo
                 try {
-                    let config = {
-                        headers: {
-                            Authorization: `Bearer ${userInfo.token}`
-                        }
-                    }
+    
                   const userinDB = await API.graphql(graphqlOperation(signup, {clientId, email}))
                   console.log(userinDB)
                 } catch (err) {

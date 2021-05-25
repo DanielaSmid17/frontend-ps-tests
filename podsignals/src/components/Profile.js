@@ -12,6 +12,7 @@ import IconButton from '@material-ui/core/IconButton'
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import jwt_decode from "jwt-decode";
 
+
 const useStyles = makeStyles(theme => ({
     updateButton: {
         backgroundColor: theme.palette.common.blue,
@@ -36,10 +37,12 @@ function Profile() {
     const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
     const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
     const token = localStorage.getItem('tokenDB')
-    const userPayload = jwt_decode(token)
+    const [userPayload] = useState(jwt_decode(token))
+    console.log(userPayload)
+ 
 
     const [userInfo, setUserInfo] = useState({
-        name: userPayload.Item.name, lastName: userPayload.Item.lastName, email: userPayload.Item.email, secretKey: userPayload.Item.secret_key, plan: 'FREE'
+        name: userPayload.name ? userPayload.name : '', lastName: userPayload.lastName ? userPayload.lastName : '', email: userPayload.email, secretKey: userPayload.secret_key, plan: 'FREE'
     })
     const [showSecretKey, setShowSecretKey] = useState(false);
     const handleClickShowPassword = () => setShowSecretKey(!showSecretKey);
@@ -47,6 +50,7 @@ function Profile() {
     const handleChange = (e) => {
         setUserInfo({...userInfo, [e.target.name] : e.target.value})
     }
+
 
     return (
         <Grid container alignItems="center" direction='column' style={{width: matchesSM ? '76%' : '90%', marginLeft: '7em', marginTop: '4em'}}>

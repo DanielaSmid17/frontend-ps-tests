@@ -14,11 +14,9 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { podcastListSort } from './utils/functions'
 
 
-import Amplify, { API, graphqlOperation } from 'aws-amplify'
-import { getPodcastById, getTopOnePodcasts, getByCatAndKey, getEvent, getCategories } from '../GraphQL/Queries';
+import { API, graphqlOperation } from 'aws-amplify'
+import { getTopOnePodcasts, getByCatAndKey, getCategories } from '../GraphQL/Queries';
 import PodcastCard from './PodcastCard'
-// import { useQuery, gql } from '@apollo/client'
-// import {getPodcast} from '../GraphQL/Queries'
 
 
 const useStyles = makeStyles(theme => ({
@@ -40,7 +38,6 @@ const useStyles = makeStyles(theme => ({
 }))
 
 function Podcasts() {
-    const classes = useStyles()
     const theme = useTheme()
 
     const [topPodcasts, setTopPodcasts] = useState([])
@@ -147,14 +144,14 @@ function Podcasts() {
                             <Grid item style={{marginTop: '0.4em'}}>
                             <Select
                             style={{width: 140}}
-                                labelId="demo-mutiple-chip-label"
+                                labelId="demo-mutiple-chip-label"Va 
                                 id="demo-mutiple-chip"
                                 onChange={handleCategoryChange}
                                 input={<Input id="select-multiple-chip" />}
                                 value={''}
                                 >
                                 {categories.map((category) => (
-                                    <MenuItem key={category} value={category} >
+                                    <MenuItem key={category} value={category} label='Categories' >
                                     {category}
                                     </MenuItem>
                                 ))}
@@ -173,7 +170,7 @@ function Podcasts() {
                         </Grid>
                             <Grid item container direction='column'>
                             <Grid item>
-                                <TextField style={{width: 140}} label="What interests you?" onChange={handleKeyWordChange} value={searchValue} />
+                                <TextField type="search" style={{width: 140}} label="What interests you?" onChange={handleKeyWordChange} value={searchValue} />
                             </Grid>
                             <Grid item>
                                 {searchValue.length < 3 && searchValue.length > 0 && <Typography variant='body1'>Search must include at least three characters</Typography>}

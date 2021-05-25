@@ -32,3 +32,20 @@ export const createAlert = /* GraphQL */ `
     }
   }
 `;
+
+export const deleteAlert = /* GraphQL */ `
+  mutation DeleteAlert($id: String!) {
+    deleteAlert(id: $id) {
+      deleted {
+        client_id
+        created_at
+        id
+        keyword
+        type {
+          id
+          type
+        }
+      }
+    }
+  }
+`;
